@@ -18,6 +18,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
@@ -327,5 +328,23 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /** TODO
+     * Gets called every time the user presses the menu button.
+     * Use if your menu is dynamic.
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.clear();
+        if(enableAdd)
+            menu.add(0, MENU_ADD, Menu.NONE, R.string.your-add-text).setIcon(R.drawable.your-add-icon);
+        if(enableList)
+            menu.add(0, MENU_LIST, Menu.NONE, R.string.your-list-text).setIcon(R.drawable.your-list-icon);
+        if(enableRefresh)
+            menu.add(0, MENU_REFRESH, Menu.NONE, R.string.your-refresh-text).setIcon(R.drawable.your-refresh-icon);
+        if(enableLogin)
+            menu.add(0, MENU_LOGIN, Menu.NONE, R.string.your-login-text).setIcon(R.drawable.your-login-icon);
+        return super.onPrepareOptionsMenu(menu);
+    }
+     */
 
 }

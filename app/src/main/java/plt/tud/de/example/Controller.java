@@ -27,6 +27,11 @@ public class Controller {
 
 
     public void createPlan(String maintenancePlan, String tourID, String kennzeichen) {
+        for(Plan existingPlan :planList){
+            if( existingPlan.getMaintenancePlan() == maintenancePlan){
+                return;
+            }
+        }
         Plan plans = new Plan(maintenancePlan, tourID, kennzeichen);
         planList.add(plans);
         Log.i("createPlan", " " + maintenancePlan + " " + tourID);
