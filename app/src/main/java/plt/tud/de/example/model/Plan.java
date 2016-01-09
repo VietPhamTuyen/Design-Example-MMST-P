@@ -35,6 +35,9 @@ public class Plan {
     public String getMaintenancePlan(){
         return maintenancePlan;
     }
+    public String getTourID(){
+        return tourID;
+    }
 
     /**
      * 3. LD request, save workingLabel (how to do it) to the right workingLink(link for the WorkingStep)

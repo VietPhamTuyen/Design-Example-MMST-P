@@ -28,10 +28,6 @@
 
             </android.support.v7.widget.Toolbar>
 
-            <android.support.design.widget.TabLayout
-                android:id="@+id/tabs"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
 
         </android.support.design.widget.AppBarLayout>
 
@@ -43,22 +39,5 @@
             android:layout_below="@+id/appbar"
             android:layout_centerHorizontal="true" />
 
-        <Button
-            android:id="@+id/button_start"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:onClick="onButtonClicked"
-            android:text="New Button" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="add waiting thing"
-            android:id="@+id/textView6"
-            android:layout_below="@+id/appbar"
-            android:layout_alignLeft="@+id/button_start"
-            android:layout_alignStart="@+id/button_start" />
     </RelativeLayout>
 </android.support.design.widget.CoordinatorLayout>

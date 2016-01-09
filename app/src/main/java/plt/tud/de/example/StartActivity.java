@@ -1,12 +1,16 @@
 package plt.tud.de.example;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,10 +29,13 @@ public class StartActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position,
                                     long id) {
+                //TODO postion-- ?
+                //position--;
                 Intent intent = new Intent(getBaseContext(), MainActivity.class);
-                intent.putExtra("",""); //TODO add listitem
+                intent.putExtra("position",String.valueOf(position)); //TODO add listitem
                 // i.putExtra("NodeID", selectedDevice);
                 // i.putExtra("PositionOnList", selectedNumber);
+
                 startActivity(intent);
             }
         });
@@ -38,20 +45,89 @@ public class StartActivity extends AppCompatActivity {
 
         controller.createLD("getMaintenancePlan","","",""); //TODO
 
-
+        controller.updateStartActivity(this);
     }
 
-    public void onButtonClicked(View v) {
-        switch (v.getId()) {
-            case R.id.button_start:
-                Intent i = new Intent(getBaseContext(), MainActivity.class);
-                // i.putExtra("NodeID", selectedDevice);
-                // i.putExtra("PositionOnList", selectedNumber);
-                startActivity(i);
 
-                break;
+
+    public void  updateListView(ArrayList<String> listItem){
+        List<String> newString = listItem;
+        String[] inputStringList = newString.toArray(new String[newString.size()]);
+        ListView parameterList = (ListView) findViewById(R.id.listTour);
+        parameterList.setAdapter(new ArrayAdapter<String>(this, R.layout.list_item, inputStringList));
+    }
+
+
+    @Override
+    public void onBackPressed() {
+
+            // If the user is currently looking at the first step, allow the system to handle the
+            // Back button. This calls finish() on this activity and pops the back stack.
+
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("Are you sure you want to terminate the connection?").setCancelable(false).
+                    setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            StartActivity.super.onBackPressed();
+                        }
+                    });
+            AlertDialog alert = builder.create();
+            alert.show();
+
         }
-    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // TODO http://developer.android.com/training/keyboard-input/navigation.html
 
 
 }

@@ -1,14 +1,21 @@
 package plt.tud.de.example;
 
+import android.app.AlertDialog;
+import android.app.FragmentTransaction;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.app.ActionBar.Tab;
+import android.app.ActionBar;
 
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.GravityCompat;
@@ -21,10 +28,19 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import org.apache.log4j.chainsaw.Main;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 import plt.tud.de.example.fragments.AboutFragment;
 import plt.tud.de.example.fragments.ContentFragment;
@@ -35,13 +51,17 @@ import plt.tud.de.example.fragments.Fragment_Task;
 import plt.tud.de.example.fragments.LinkedDataFragment;
 import plt.tud.de.example.fragments.SettingsFragment;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends FragmentActivity implements
+        ActionBar.TabListener {
+
+
+    private String[] drawerListViewItems;
 
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
-    private NavigationView mDrawer;
+    private ListView mDrawer;
 
-    private Context mContext=null;
+    private Context mContext = null;
     public static LDQueryActivity LD = new LDQueryActivity();
 
     ListView tweetList;
@@ -53,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
 
     private String myTAG = "debug";
     public int currentPage;
+    public int tabPosition = 0;
 
     static Controller controller = new Controller();
 
@@ -60,10 +81,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mContext = this;
+        controller.synch(this);
         setContentView(R.layout.activity_main);
 
+
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        //setSupportActionBar(toolbar);
 
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), this);
         mViewPager = (ViewPager) findViewById(R.id.container);
@@ -98,83 +121,59 @@ public class MainActivity extends AppCompatActivity {
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
 
+        controller.setNavList();
+
+        mDrawer.setOnItemClickListener(new DrawerItemClickListener());
 
 
-        //Creating the floating button
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.connectBtn);
-        fab.setOnClickListener(new View.OnClickListener() {
+        /**
+         * on swiping the viewpager make respective tab selected
+         * */
+        mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+
             @Override
-            public void onClick(View view) {
-                //TODO delete
-                controller.createLD("getMaintenancePlan","","","");
+            public void onPageSelected(int position) {
+                // on changing the page
+                // make respected tab selected
+                //actionBar.setSelectedNavigationItem(position);
+                Log.i("tab position", String.valueOf(position));
+                tabPosition = position;
+            }
 
-                //Snackbar.make(findViewById(R.id.connectBtn), "Start your neat stuff here", Snackbar.LENGTH_LONG)
-                //        .setAction("Action", null).show();
+            @Override
+            public void onPageScrolled(int arg0, float arg1, int arg2) {
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int arg0) {
             }
         });
 
-        mDrawer = (NavigationView) findViewById(R.id.left_drawer);
-        setupDrawerContent(mDrawer);
+
+        Bundle extras = getIntent().getExtras();
+        String inputString = extras.getString("position");
+        int position = Integer.parseInt(inputString);   // TODO whatList?
+        //changeList(position);                            //TODO check for C2
+        controller.changeNavDToMaintenanceList(position);
+
+
     }
 
-    private void setupDrawerContent(NavigationView navigationView) {
-        navigationView.setNavigationItemSelectedListener(
-                new NavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(MenuItem menuItem) {
-                        selectDrawerItem(menuItem);
-                        return true;
-                    }
-                });
+
+    public void setMenuView(ArrayList<String> incomingList) {
+        //drawerListViewItems = getResources().getStringArray(R.array.items);
+
+        List<String> newString = incomingList;
+
+
+        drawerListViewItems = newString.toArray(new String[newString.size()]);
+
+
+        mDrawer = (ListView) findViewById(R.id.left_drawer);
+        mDrawer.setAdapter(new ArrayAdapter<String>(this,
+                R.layout.list_item, drawerListViewItems));
     }
 
-    public void selectDrawerItem(MenuItem menuItem) {
-        // Create a new fragment and specify the planet to show based on
-        // position
-        Fragment fragment = null;
-
-        Class fragmentClass;
-        switch(menuItem.getItemId()) {
-            case R.id.action_connection:
-                fragmentClass = ContentFragment.class;
-                findViewById(R.id.connectBtn).setVisibility(View.VISIBLE);
-                break;
-            case R.id.action_about:
-                fragmentClass = AboutFragment.class;
-                findViewById(R.id.connectBtn).setVisibility(View.GONE);
-                break;
-            case R.id.action_settings:
-                fragmentClass = SettingsFragment.class;
-                findViewById(R.id.connectBtn).setVisibility(View.GONE);
-                break;
-
-            case R.id.action_linkedData:
-                //TODO
-
-                fragmentClass = LinkedDataFragment.class;
-                findViewById(R.id.connectBtn).setVisibility(View.VISIBLE);
-
-                controller.createLD("getMaintenancePlan","","",""); //TODO
-                break;
-            default:
-                fragmentClass = ContentFragment.class;
-        }
-
-        try {
-            fragment = (Fragment) fragmentClass.newInstance();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        // Insert the fragment by replacing any existing fragment
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
-
-        // Highlight the selected item, update the title, and close the drawer
-        menuItem.setChecked(true);
-        setTitle(menuItem.getTitle());
-        mDrawerLayout.closeDrawers();
-    }
 
     /**
      * When using the ActionBarDrawerToggle, you must call it during
@@ -207,31 +206,41 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
 
-         if (mViewPager.getCurrentItem() == 0) {
-         // If the user is currently looking at the first step, allow the system to handle the
-         // Back button. This calls finish() on this activity and pops the back stack.
-         super.onBackPressed();
-         } else {
-         // Otherwise, select the previous step.
-             mViewPager.setCurrentItem(mViewPager.getCurrentItem() - 1);
-         }
+        if (mViewPager.getCurrentItem() == 0) {
+            // If the user is currently looking at the first step, allow the system to handle the
+            // Back button. This calls finish() on this activity and pops the back stack.
+
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("Are you sure you want to go back?").setCancelable(true).
+                    setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            MainActivity.super.onBackPressed();
+                        }
+                    });
+            AlertDialog alert = builder.create();
+            alert.show();
+
+        } else {
+            // Otherwise, select the previous step.
+            mViewPager.setCurrentItem(mViewPager.getCurrentItem() - 1);
+        }
 
     }
 
 
     /**
      * call from LDQuery.Activity.handleMessage()
+     *
      * @param listItem
      */
-    public void linkedDataListInput(ArrayList<String> listItem){
+    public void linkedDataListInput(ArrayList<String> listItem) {
 
         arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, listItem);
-        tweetList= (ListView)this.findViewById(R.id.linkedDataList);
+        tweetList = (ListView) this.findViewById(R.id.linkedDataList);
         tweetList.setAdapter(arrayAdapter);
 
     }
-
-
 
 
     public void set_currentPage(int pageIndex) {
@@ -239,8 +248,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void onButtonClicked(View v){
-        switch(v.getId()){
+    public void onButtonClicked(View v) {
+        switch (v.getId()) {
             case R.id.button_task_ok:
                 set_currentPage(1);
                 break;
@@ -267,6 +276,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 //--------------------------------------------------------------------------------
+
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
@@ -282,7 +292,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int position) {
-            Log.i(myTAG,"getItem"+ String.valueOf(position));
+            Log.i(myTAG, "getItem" + String.valueOf(position));
             // getItem is called to instantiate the fragment for the given page.
             Fragment fragment = null;
             switch (position) {
@@ -313,7 +323,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public CharSequence getPageTitle(int position) {
-            Log.i(myTAG,"getPageTitle"+ String.valueOf(position));
+            Log.i(myTAG, "getPageTitle" + String.valueOf(position));
             switch (position) {
                 case 0:
                     return "Aufgabe";
@@ -326,25 +336,72 @@ public class MainActivity extends AppCompatActivity {
             }
             return null;
         }
+
+
     }
 
-    /** TODO
-     * Gets called every time the user presses the menu button.
-     * Use if your menu is dynamic.
+    /**
+     * display workingSteps in list in Fragment_Task
+     *
+     * @param position - position in List
+     */
+    public void changeList(int position) {
+        ArrayList<String> listItem = new ArrayList<>();
+        listItem = controller.getWorkingSteps(position);
+        List<String> newString = listItem;
+
+        String[] inputStringList = newString.toArray(new String[newString.size()]);
+
+        // ArrayAdapter<String> arrayAdapter_list = new ArrayAdapter<String>(this, R.layout.list_item, inputStringList);
+        ListView parameterList = (ListView) findViewById(R.id.listView_task);
+        parameterList.setAdapter(new ArrayAdapter<String>(this, R.layout.list_item, inputStringList));
+
+    }
+
+    /**
+     * listener for Navigation Drawer
+     */
+    private class DrawerItemClickListener implements ListView.OnItemClickListener {
+        @Override
+        public void onItemClick(AdapterView parent, View view, int position, long id) {
+            TextView text = (TextView) view;
+
+            if (controller.checkTour(text.getText().toString())) { //if tour is clicked
+                controller.changeNavDToMaintenanceList(position);
+            }else if (position == 0){
+                controller.setNavList();
+            }else {
+
+
+                    if (tabPosition == 0) {   //in fragment_task
+                        changeList(position);
+                    }
+
+                    mDrawerLayout.closeDrawers();
+
+
+
+                // controller.setNavList(); // have to show positions?
+            }
+
+
+        }
+    }
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        menu.clear();
-        if(enableAdd)
-            menu.add(0, MENU_ADD, Menu.NONE, R.string.your-add-text).setIcon(R.drawable.your-add-icon);
-        if(enableList)
-            menu.add(0, MENU_LIST, Menu.NONE, R.string.your-list-text).setIcon(R.drawable.your-list-icon);
-        if(enableRefresh)
-            menu.add(0, MENU_REFRESH, Menu.NONE, R.string.your-refresh-text).setIcon(R.drawable.your-refresh-icon);
-        if(enableLogin)
-            menu.add(0, MENU_LOGIN, Menu.NONE, R.string.your-login-text).setIcon(R.drawable.your-login-icon);
-        return super.onPrepareOptionsMenu(menu);
+    public void onTabReselected(Tab tab, FragmentTransaction ft) {
     }
-     */
+
+    @Override
+    public void onTabSelected(Tab tab, FragmentTransaction ft) {
+        // on tab selected
+        // show respected fragment view
+        mViewPager.setCurrentItem(tab.getPosition());
+    }
+
+    @Override
+    public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+    }
+
 
 }

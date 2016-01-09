@@ -22,6 +22,7 @@ import plt.tud.de.example.model.WorkingStep;
  */
 public class Fragment_Task extends Fragment {
     Controller controller = new Controller();
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -29,34 +30,12 @@ public class Fragment_Task extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_task, container, false);
 
+        Log.i("create frag Task", "task" + String.valueOf(controller.getPlanList().size()));
 
+        //ArrayList<String> listItem = new ArrayList<>();
+        ArrayList<String> listItem = controller.showCurrentTask();
+        Log.i("stringSize", String.valueOf(listItem.size()));
 
-        /**
-        ArrayList<Plan> planList;
-        planList = controll.getPlanList();
-
-        ArrayList<String> listItem = new ArrayList<>();
-        listItem.add(String.valueOf(LDDDList.size()));
-        int counter= 0;
-        for (Plan plan : planList) {
-            ArrayList<WorkingStep> workingSteps;
-            workingSteps = plan.getStepList();
-            listItem.add(plan.getMaintenancePlan()+", ");
-            for(WorkingStep step: workingSteps){
-                step.getWorkingLabel();
-                listItem.add(step.getWorkingLabel());
-            }
-            counter++;
-         }
-         */
-        Log.i("create frag Task", "task"+ String.valueOf(controller.getPlanList().size()));
-
-        ArrayList<String> listItem = new ArrayList<>();
-
-        for(int counter = 0; counter < controller.getPlanList().size(); counter++){
-            listItem.add(controller.getString(counter));
-            Log.i("getString", controller.getString(counter));
-        }
 
         ArrayAdapter<String> arrayAdapter_list = new ArrayAdapter<>(getContext(), R.layout.list_item, listItem);
         ListView parameterList = (ListView) view.findViewById(R.id.listView_task);
@@ -67,8 +46,7 @@ public class Fragment_Task extends Fragment {
         return view;
 
 
-
-    //    listView_task
-    //    return inflater.inflate(R.layout.fragment_task, container, false);
+        //    listView_task
+        //    return inflater.inflate(R.layout.fragment_task, container, false);
     }
 }

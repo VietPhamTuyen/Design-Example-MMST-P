@@ -12,13 +12,23 @@ import plt.tud.de.example.model.WorkingStep;
  */
 public class Controller {
 
-    static ArrayList<Plan> planList = new ArrayList<>();
+    static ArrayList<String> tourList = new ArrayList<String>();
+    static ArrayList<String> navigationDrawerList = new ArrayList<String>();
+    static ArrayList<String> maintenanceList = new ArrayList<String>();
+    static ArrayList<String> workingStepStringList = new ArrayList<String>();
+
+    static ArrayList<Plan> planList = new ArrayList<Plan>();
     static LDQueryActivity LDA = new LDQueryActivity();
+    static MainActivity main;
+    static String currentMaintenanceStep = "";
+    static StartActivity startActivity;
 
     public Controller() {
-
     }
 
+    public void synch(MainActivity main) {
+        this.main = main;
+    }
 
     //TODO start this with createLD("getMaintenancePlan","","",""); anywhere
     public void createLD(String requestedData, String plan, String tourID, String workingStep) {
@@ -27,8 +37,8 @@ public class Controller {
 
 
     public void createPlan(String maintenancePlan, String tourID, String kennzeichen) {
-        for(Plan existingPlan :planList){
-            if( existingPlan.getMaintenancePlan() == maintenancePlan){
+        for (Plan existingPlan : planList) {
+            if (existingPlan.getMaintenancePlan() == maintenancePlan) {
                 return;
             }
         }
@@ -73,6 +83,12 @@ public class Controller {
 
             }
         }
+
+        try{
+            getStartList();
+        }catch(Exception e){
+            Log.i("error", e.getMessage());
+        }
     }
 
 
@@ -82,6 +98,7 @@ public class Controller {
     }
 
 
+    //TODO delete
     public String getString(int place) {
         Plan plan;
         plan = planList.get(place);
@@ -90,6 +107,115 @@ public class Controller {
 
 
         return stringShow;
+    }
+
+
+    /**
+     * show a list with all tourIDs  in the navigation drawer
+     */
+    public void setNavList() {
+        navigationDrawerList = new ArrayList<String>();
+        navigationDrawerList.add("Tour");
+        tourList = new ArrayList<String>();
+        for (Plan plan : planList) {
+            String tourID = plan.getTourID();
+            tourexist:
+            {
+                //filter existing tours
+                for (String tour : tourList) {
+                    if (tour.equals(tourID)) {
+                        break tourexist;
+                    }
+                }
+                tourList.add(tourID);
+                navigationDrawerList.add(tourID);
+            }
+        }
+        main.setMenuView(navigationDrawerList);
+    }
+
+
+    /**
+     * show a list with all plans from a certain tour in the navigation drawer
+     */
+    public void changeNavDToMaintenanceList(int position) {
+        position--; // offset from "Zurück"
+        maintenanceList = new ArrayList<String>();
+        maintenanceList.add("Zurück");
+        String plan = tourList.get(position);
+        for (Plan p : planList) {
+            if (p.getTourID().equals(plan)) {         //add the maintenanceplan if its in the right tour
+                maintenanceList.add(p.getMaintenancePlan());
+            }
+        }
+            main.setMenuView(maintenanceList);
+
+
+    }
+
+
+    public ArrayList<String> getWorkingSteps(int position) {
+        workingStepStringList = new ArrayList<>();
+
+
+        currentMaintenanceStep = maintenanceList.get(position);
+        workingStepStringList.add("Plan: " + currentMaintenanceStep);
+        for (Plan p : planList) {
+            if (currentMaintenanceStep.equals(p.getMaintenancePlan())) { // if its the right maintenanceStep
+                ArrayList<WorkingStep> stepList = p.getStepList();
+                for (WorkingStep step : stepList) {                      //then add the working labels to the shown Array
+                    workingStepStringList.add(step.getWorkingLabel());
+                }
+            }
+
+        }
+        return workingStepStringList;
+    }
+
+
+    public boolean checkTour(String tour_check) {
+        for (String tour : tourList) {
+            if (tour.equals(tour_check)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public ArrayList<String> showCurrentTask() {
+
+        return workingStepStringList;
+    }
+
+
+
+    public void updateStartActivity(StartActivity startActivity) {
+        this.startActivity = startActivity;
+        getStartList();
+    }
+
+    public void getStartList(){
+        ArrayList<String> listItem = new ArrayList<String>();
+
+
+
+        listItem = new ArrayList<String>();
+        listItem.add("Tour");
+        for (Plan plan : planList) {
+            String tourID = plan.getTourID();
+            tourexist:{
+                //filter existing tours
+                for (String tour : listItem) {
+                    if (tour.equals(tourID)) {
+                        break tourexist;
+                    }
+                }
+                listItem.add(tourID);
+            }
+        }
+
+
+        startActivity.updateListView(listItem);
     }
 
 }
