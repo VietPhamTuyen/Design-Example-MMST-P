@@ -2,8 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="#fb0606">
+    android:background="#fb0606"
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/section_label"
@@ -18,12 +18,13 @@
         android:text="implementation" />
 
     <Button
-    android:id="@+id/button_implementation_ok"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_gravity="center_horizontal"
-    android:onClick="onButtonClicked"
-    android:text="@string/ok" />
+        android:id="@+id/button_implementation_ok"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:onClick="onButtonClicked"
+        android:text="@string/ok" />
+
     <Button
         android:id="@+id/button_implementation_cancel"
         android:layout_width="wrap_content"
@@ -31,4 +32,9 @@
         android:layout_gravity="center_horizontal"
         android:onClick="onButtonClicked"
         android:text="@string/cancel" />
+
+    <ListView
+        android:id="@+id/listView_implementation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 </LinearLayout>

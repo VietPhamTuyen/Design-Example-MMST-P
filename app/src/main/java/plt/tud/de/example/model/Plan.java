@@ -8,10 +8,10 @@ import java.util.ArrayList;
 public class Plan {
     ArrayList<WorkingStep> workingStepList = new ArrayList<>();
     String maintenancePlan;
-    String tourID;
+    String tourID;  //e.g. C2
     String kennzeichen;
+    public boolean check = false;
 
-    String id;
 
 
 
@@ -61,5 +61,14 @@ public class Plan {
 
         return stringShow;
     }
+
+    public String getKennzeichen(){
+        return kennzeichen;
+    }
+
+    public void check(){
+        check = true;
+    }
+
 
 }

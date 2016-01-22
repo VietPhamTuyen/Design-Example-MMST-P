@@ -8,14 +8,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 
 import plt.tud.de.example.Controller;
 import plt.tud.de.example.R;
-import plt.tud.de.example.model.Plan;
-import plt.tud.de.example.model.WorkingStep;
 
 /**
  * Created by Viet on 05.01.2016.
@@ -26,7 +23,6 @@ public class Fragment_Task extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
 
         View view = inflater.inflate(R.layout.fragment_task, container, false);
 
@@ -36,17 +32,16 @@ public class Fragment_Task extends Fragment {
         ArrayList<String> listItem = controller.showCurrentTask();
         Log.i("stringSize", String.valueOf(listItem.size()));
 
-
         ArrayAdapter<String> arrayAdapter_list = new ArrayAdapter<>(getContext(), R.layout.list_item, listItem);
         ListView parameterList = (ListView) view.findViewById(R.id.listView_task);
 
-        parameterList.setAdapter(arrayAdapter_list);
-
+        try {
+            parameterList.setAdapter(arrayAdapter_list);
+        } catch(Exception e){
+            Log.i("error fragmentTask", " "+ e.getMessage());
+        }
 
         return view;
 
-
-        //    listView_task
-        //    return inflater.inflate(R.layout.fragment_task, container, false);
     }
 }
