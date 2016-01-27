@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.app.ActionBar.Tab;
 import android.app.ActionBar;
 
+import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -72,6 +74,7 @@ public class MainActivity extends AppCompatActivity implements
     private float x1, x2;
     static final int MIN_DISTANCE = 150;
 
+    MainActivity main = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,13 +119,13 @@ public class MainActivity extends AppCompatActivity implements
             public void onDrawerClosed(View view) {
                 Log.i("onDrawerClosed", "close");
                 super.onDrawerClosed(view);
-             //   invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+                //   invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
 
             public void onDrawerOpened(View drawerView) {
                 Log.i("onDrawerOpened", "open");
                 super.onDrawerOpened(drawerView);
-            //    invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+                //    invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
@@ -170,9 +173,6 @@ public class MainActivity extends AppCompatActivity implements
         });
 
 
-
-
-
         controller.changeNavDToMaintenanceList();
 
 
@@ -183,6 +183,10 @@ public class MainActivity extends AppCompatActivity implements
 
         setTitleName();
 
+
+
+
+
     }
 
 
@@ -192,10 +196,11 @@ public class MainActivity extends AppCompatActivity implements
      * 19 - KEYCODE_DPAD_UP 3     -> 47 - KEYCODE_W
      * 20 - KEYCODE_DPAD_DOWN 4   -> 51 - KEYCODE_S
      * 21 - KEYCODE_DPAD_LEFT 2   -> 29 - KEYCODE_A
-     ** 22 - KEYCODE_DPAD_RIGHT 5 -> 32 - KEYCODE_D
+     * 22 - KEYCODE_DPAD_RIGHT 5  -> 32 - KEYCODE_D
      * 67 - KEYCODE_DEL 6
      * 112 - KEYCODE_FORWARD_DEL 7
-     *x
+     * x
+     *
      * @param keyCode
      * @param event
      * @return
@@ -203,58 +208,59 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         Log.i("key", "----------------------------");
-        Log.i("Keycode", " "+ String.valueOf(keyCode));
-        Log.i("Keyevent", " "+ event.toString());
+        Log.i("Keycode", " " + String.valueOf(keyCode));
+        Log.i("Keyevent", " " + event.toString());
 
         switch (keyCode) {
-            case KeyEvent.KEYCODE_ENTER:{
+            case KeyEvent.KEYCODE_ENTER: {
                 return super.onKeyDown(keyCode, event);
             }
 
-            case KeyEvent.KEYCODE_DPAD_LEFT:{
-                if(currentPage == 0){
+            case KeyEvent.KEYCODE_DPAD_LEFT: {
+                if (currentPage == 0) {
                     mDrawerLayout.openDrawer(GravityCompat.START);
-                }else if(!(currentPage == 0)){
+                } else if (!(currentPage == 0)) {
                     set_currentPage(currentPage - 1);
                 }
 
                 return false;
             }
 
-            case KeyEvent.KEYCODE_DPAD_RIGHT:{
+            case KeyEvent.KEYCODE_DPAD_RIGHT: {
 
-                if(mDrawerLayout.isDrawerOpen(Gravity.LEFT)){
+                if (mDrawerLayout.isDrawerOpen(Gravity.LEFT)) {
                     mDrawerLayout.closeDrawers();
 
-                }else if(!(currentPage == 3)){
+                } else if (!(currentPage == 3)) {
                     set_currentPage(currentPage + 1);
-                }else if(currentPage == 3){
+                } else if (currentPage == 3) {
                     controller.nextPlan();
+
                     setTitleName();
                 }
 
                 return false;
 
             }
-            case KeyEvent.KEYCODE_DPAD_UP:{
-           //     if(mDrawerLayout.isDrawerOpen(GravityCompat.START)){
-                    super.onKeyDown(keyCode, event);
+            case KeyEvent.KEYCODE_DPAD_UP: {
+                //     if(mDrawerLayout.isDrawerOpen(GravityCompat.START)){
+                super.onKeyDown(keyCode, event);
 
             }
-            case KeyEvent.KEYCODE_DPAD_DOWN:{
-             //   if(mDrawerLayout.isDrawerOpen(GravityCompat.START)){
+            case KeyEvent.KEYCODE_DPAD_DOWN: {
+                //   if(mDrawerLayout.isDrawerOpen(GravityCompat.START)){
 
-                    super.onKeyDown(keyCode, event);
+                super.onKeyDown(keyCode, event);
             }
-            case KeyEvent.KEYCODE_DEL:{
+            case KeyEvent.KEYCODE_DEL: {
                 return super.onKeyDown(keyCode, event);
 
             }
-            case KeyEvent.KEYCODE_BACK:{
+            case KeyEvent.KEYCODE_BACK: {
                 onBackPressed();
                 return super.onKeyDown(keyCode, event);
             }
-            case KeyEvent.KEYCODE_ESCAPE:{
+            case KeyEvent.KEYCODE_ESCAPE: {
                 onBackPressed();
                 return super.onKeyDown(keyCode, event);
             }
@@ -266,7 +272,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
         switch (keyCode) {
-            case KeyEvent.KEYCODE_ENTER:{
+            case KeyEvent.KEYCODE_ENTER: {
                 this.getCurrentFocus().clearFocus();
                 return false;
             }
@@ -283,14 +289,24 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-
-    public void switchToast(){
+    public void switchToast() {
         Toast.makeText(this, "Switch to next maintenanceplan", Toast.LENGTH_SHORT).show();
     }
-    public void beginAgain(){
+
+    public void beginAgain() {
         Toast.makeText(this, "All Tours done, start with first", Toast.LENGTH_SHORT).show();
     }
 
+    public void makeToast(String text) {
+        final String txt = text;
+
+        this.runOnUiThread(new Runnable() {
+            public void run() {
+                Toast.makeText(main, txt, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
 
 
     /**
@@ -379,7 +395,7 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
-    public void callpage(int page){
+    public void callpage(int page) {
         set_currentPage(page);
     }
 
@@ -391,32 +407,14 @@ public class MainActivity extends AppCompatActivity implements
 
     public void onButtonClicked(View v) {
         switch (v.getId()) {
-            case R.id.button_task_ok:
-                set_currentPage(1);
-                break;
-            case R.id.button_implementation_ok:
-                set_currentPage(2);
-                break;
-            case R.id.button_return_ok:
-                set_currentPage(3);
-                break;
+
             case R.id.button_result_ok:
                 switchToast();
                 Log.i("button", "button_result_ok");
                 controller.nextPlan();
                 setTitleName();
                 break;
-            case R.id.button_task_cancel:
-                break;
-            case R.id.button_implementation_cancel:
-                set_currentPage(0);
-                break;
-            case R.id.button_return_cancel:
-                set_currentPage(1);
-                break;
-            case R.id.button_result_cancel:
-                set_currentPage(2);
-                break;
+
         }
     }
 
@@ -499,23 +497,27 @@ public class MainActivity extends AppCompatActivity implements
         List<String> newString = listItem;
 
         String[] inputStringList = newString.toArray(new String[newString.size()]);
+        try {
+            // ArrayAdapter<String> arrayAdapter_list = new ArrayAdapter<String>(this, R.layout.list_item, inputStringList);
+            if (listItem.size() > 0) {
+                Log.i("debug", "list >0");
+                if (tabPosition == 0) {
+                    ListView parameterList = (ListView) findViewById(R.id.listView_task);
+                    try {
+                        parameterList.setAdapter(new ArrayAdapter<String>(this, R.layout.list_item, inputStringList));
+                    } catch (Exception e) {
 
-        // ArrayAdapter<String> arrayAdapter_list = new ArrayAdapter<String>(this, R.layout.list_item, inputStringList);
-        if (listItem.size() > 0) {
-            Log.i("debug", "list >0");
-            if (tabPosition == 0) {
-                ListView parameterList = (ListView) findViewById(R.id.listView_task);
-                try {
-                    parameterList.setAdapter(new ArrayAdapter<String>(this, R.layout.list_item, inputStringList));
-                } catch (Exception e) {
-
+                    }
                 }
+            } else {
+                Toast.makeText(this, "to be loadet",
+                        Toast.LENGTH_LONG).show();
             }
-        } else {
+        } catch (Exception e) {
             Toast.makeText(this, "to be loadet",
                     Toast.LENGTH_LONG).show();
+            return;
         }
-
     }
 
 
@@ -559,7 +561,7 @@ public class MainActivity extends AppCompatActivity implements
 
     public void setTitleName() {
         String checkedP = " ";
-        if(controller.isChecked()){
+        if (controller.isChecked()) {
             checkedP = " Pcheck ";
         }
         setTitle(controller.getCurrentTour() + checkedP + controller.getCurrentPlan());

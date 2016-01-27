@@ -1,11 +1,15 @@
 package plt.tud.de.example.model;
 
+import java.util.ArrayList;
+
 /**
  * Created by Viet on 07.01.2016.
  */
 public class WorkingStep {
     String stepLink;
     String workingLabel;
+    ArrayList<String> possibleStatusList = new ArrayList<>();
+
 
 
     public WorkingStep(String stepLink ){
@@ -32,4 +36,16 @@ public class WorkingStep {
 
     }
 
+    public void savePossibleStatus(String possibleStatus){
+        possibleStatusList.add(possibleStatus);
+    }
+
+    public ArrayList<String> getPossibleStatusList(){
+        return possibleStatusList;
+    }
+
+
+    public void resetPossibleStatusList(){
+        possibleStatusList = new ArrayList<>();
+    }
 }

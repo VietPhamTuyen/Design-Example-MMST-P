@@ -26,11 +26,9 @@ public class Fragment_Task extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_task, container, false);
 
-        Log.i("create frag Task", "task" + String.valueOf(controller.getPlanList().size()));
 
         //ArrayList<String> listItem = new ArrayList<>();
         ArrayList<String> listItem = controller.showCurrentTask();
-        Log.i("stringSize", String.valueOf(listItem.size()));
 
         ArrayAdapter<String> arrayAdapter_list = new ArrayAdapter<>(getContext(), R.layout.list_item, listItem);
         ListView parameterList = (ListView) view.findViewById(R.id.listView_task);

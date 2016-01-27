@@ -21,11 +21,5 @@
         android:layout_gravity="center_horizontal"
         android:onClick="onButtonClicked"
         android:text="@string/ok" />
-    <Button
-        android:id="@+id/button_result_cancel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:onClick="onButtonClicked"
-        android:text="@string/cancel" />
+
 </LinearLayout>

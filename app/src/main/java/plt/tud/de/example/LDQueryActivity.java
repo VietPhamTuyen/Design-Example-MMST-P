@@ -87,7 +87,7 @@ public class LDQueryActivity {
 
         String query = "";
         if (requestedData == "getMaintenancePlan") {
-            Log.i("composeQuery" , "1 getMaintenancePlan");
+            Log.i("composeQuery", "1 getMaintenancePlan");
 
             String rdfs = "http://www.w3.org/2000/01/rdf-schema#";
             String rdfsns = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
@@ -109,7 +109,7 @@ public class LDQueryActivity {
 
                     + "?s mto:refIdTour ?id."
                     + "FILTER (!(?id= \"\" ))"
-                    + "FILTER regex(?id, \""+tourID+"\")"       //TODO
+                    + "FILTER regex(?id, \"" + tourID + "\")"       //TODO
 
                     + "?s rdfs:label ?kennzeichen."
                     + "}"
@@ -117,7 +117,7 @@ public class LDQueryActivity {
 
 
         } else if (requestedData == "getWorkingSteps") {
-            Log.i("composeQuery" , "2 getWorkingSteps");
+            Log.i("composeQuery", "2 getWorkingSteps");
             String rdfs = "http://www.w3.org/2000/01/rdf-schema#";
             String rdfsns = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
             String mto = "http://eatld.et.tu-dresden.de/mto/";
@@ -134,11 +134,11 @@ public class LDQueryActivity {
                     + "SELECT DISTINCT ?s ?maintenancePlan ?id ?kennzeichen ?workingstep FROM <" + uri + ">"
                     + "WHERE {"
                     + "?s mto:maintenancePlan ?maintenancePlan."
-                    + "FILTER regex(?maintenancePlan, \""+plan+"\")" //TODO
+                    + "FILTER regex(?maintenancePlan, \"" + plan + "\")" //TODO
 
                     + "?s mto:refIdTour ?id."
                     + "FILTER (!(?id= \"\" ))"
-                    + "FILTER regex(?id, \""+tourID+"\")" //TODO
+                    + "FILTER regex(?id, \"" + tourID + "\")" //TODO
 
                     + "?s rdfs:label ?kennzeichen."
 
@@ -148,7 +148,7 @@ public class LDQueryActivity {
 
 
         } else if (requestedData == "getWorkingTitle") {
-            Log.i("composeQuery" , "3 getWorkingTitle");
+            Log.i("composeQuery", "3 getWorkingTitle");
             String rdfs = "http://www.w3.org/2000/01/rdf-schema#";
             String rdfsns = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
             String mto = "http://eatld.et.tu-dresden.de/mto/";
@@ -165,16 +165,16 @@ public class LDQueryActivity {
                     + "SELECT DISTINCT ?s ?maintenancePlan ?id ?kennzeichen ?workingstep ?workinglabel FROM <" + uri + ">"
                     + "WHERE {"
                     + "?s mto:maintenancePlan ?maintenancePlan."
-                    + "FILTER regex(?maintenancePlan, \"" +plan+ "\")"      //TODO
+                    + "FILTER regex(?maintenancePlan, \"" + plan + "\")"      //TODO
 
                     + "?s mto:refIdTour ?id."
                     + "FILTER (!(?id= \"\" ))"
-                    + "FILTER regex(?id, \"" +tourID+ "\")"       //TODO
+                    + "FILTER regex(?id, \"" + tourID + "\")"       //TODO
 
                     + "?s rdfs:label ?kennzeichen."
 
                     + "?s mto:hasWorkingStep ?workingstep."
-                    + "FILTER regex(?workingstep, \"" +workingStep+ "\")"  //TODO
+                    + "FILTER regex(?workingstep, \"" + workingStep + "\")"  //TODO
 
                     + "?workingstep rdfs:label ?workinglabel."
 
@@ -182,6 +182,40 @@ public class LDQueryActivity {
 
 
                     + "}  LIMIT 1";
+
+        } else if (requestedData == "getPossibleStatus") {
+        Log.i("send", "getPossibleStatus");
+            String rdfs = "http://www.w3.org/2000/01/rdf-schema#";
+            String rdfsns = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+            String mto = "http://eatld.et.tu-dresden.de/mto/";
+            String opc = "http://eatld.et.tu-dresden.de/opcua/";
+            String owl = "http://www.w3.org/2002/07/owl#";
+            String purl = "http://purl.org/dc/elements/1.1/";
+
+            query = "PREFIX rdfs: <" + rdfs + "> "
+                    + "PREFIX rdfsns: <" + rdfsns + ">"
+                    + "PREFIX mto: <" + mto + "> "
+                    + "PREFIX opc: <" + opc + ">"
+                    + "PREFIX owl: <" + owl + ">"
+                    + "PREFIX purl: <" + purl + ">"
+
+                    + "SELECT DISTINCT ?s ?maintenancePlan ?id ?kennzeichen ?workingstep ?possStatLab FROM <" + uri + "> "
+                    + "WHERE {"
+                    + "?s mto:maintenancePlan ?maintenancePlan."
+                    + "FILTER regex(?maintenancePlan, \"" + plan + "\")"      //TODO
+
+                    + "?s mto:refIdTour ?id."
+                    + "FILTER (!(?id= \"\" ))"
+                    + "FILTER regex(?id, \"" + tourID + "\")"       //TODO
+
+                    + "?s rdfs:label ?kennzeichen."
+
+                    + "?s mto:hasWorkingStep ?workingstep."
+
+                    + "?workingstep mto:hasPossibleStatus ?possStat."
+                    + "?possStat rdfs:label ?possStatLab"
+
+                    + "}";
 
         }
 
@@ -202,7 +236,6 @@ public class LDQueryActivity {
         handler = new QueryResultHandler();
         // Eventually query sensor data
         querySensorData(requestedData, plan, tourID, workingStep);
-
 
 
     }
@@ -267,7 +300,6 @@ public class LDQueryActivity {
             //https://github.com/plt-tud/r43ples/blob/master/src/main/java/de/tud/plt/r43ples/triplestoreInterface/HttpInterface.java
 
 
-
             DefaultHttpClient httpClient = new DefaultHttpClient(httpParams);
             credentials = new UsernamePasswordCredentials(sparql_username, sparql_password);
             httpClient.getCredentialsProvider().setCredentials(AuthScope.ANY, credentials);
@@ -277,7 +309,7 @@ public class LDQueryActivity {
             //set up HTTP Post Request (look at http://virtuoso.openlinksw.com/dataspace/doc/dav/wiki/Main/VOSSparqlProtocol for Protocol)
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
             nameValuePairs.add(new BasicNameValuePair("format", "application/json"));
-            nameValuePairs.add(new BasicNameValuePair("query", composeQuery(uri, requestedData, plan,tourID,workingStep)));
+            nameValuePairs.add(new BasicNameValuePair("query", composeQuery(uri, requestedData, plan, tourID, workingStep)));
             nameValuePairs.add(new BasicNameValuePair("default-graph-uri", null));
             nameValuePairs.add(new BasicNameValuePair("named-graph-uri", null));
 
@@ -307,7 +339,7 @@ public class LDQueryActivity {
                 //read the response line by line
                 while (((line = rd.readLine()) != null) && (i-- != 0)) {
                     json = json + "\n" + line;
-                   // Log.i("json", "line: "+ line);
+                    // Log.i("json", "line: "+ line);
                 }
 
                 //only 10 lines are read, so delete comma at the end
@@ -319,7 +351,6 @@ public class LDQueryActivity {
                 //TODO json= json.substring(json.indexOf("{"), json.lastIndexOf("}") + 1);
 
 
-
                 //inform Handler about json dataset
                 Message msg = new Message();
                 msg.setTarget(handler);
@@ -328,8 +359,10 @@ public class LDQueryActivity {
                     msg.what = 90;
                 } else if (requestedData == "getWorkingSteps") {
                     msg.what = 80;
-                }else if (requestedData == "getWorkingTitle") {
+                } else if (requestedData == "getWorkingTitle") {
                     msg.what = 70;
+                } else if (requestedData == "getPossibleStatus") {
+                    msg.what = 60;
                 }
                 Bundle data = new Bundle();
                 data.putString("result", json);
@@ -344,9 +377,9 @@ public class LDQueryActivity {
             } catch (IOException e) {
                 e.printStackTrace();
                 Log.e(LDQueryActivity.class.getName(), e.getMessage());
-
+                controller.makeToast(LDQueryActivity.class.getName()+ e.getMessage());
 				/*
-				 * There may be no network connection or a timeout.
+                 * There may be no network connection or a timeout.
 				 * Show toast to let the user check connections.
 				 */
                 networkFailure = 1;
@@ -409,9 +442,9 @@ public class LDQueryActivity {
 
                         //fill list
 
-                       // Bundle resultBundle2 = message.getData();
-                       // String bundleNode = resultBundle2.getString("node");
-                       // listItems.add(bundleNode + ": " + s + " , " + maintenancePlan + " , " + id + " , " + kennzeichen);
+                        // Bundle resultBundle2 = message.getData();
+                        // String bundleNode = resultBundle2.getString("node");
+                        // listItems.add(bundleNode + ": " + s + " , " + maintenancePlan + " , " + id + " , " + kennzeichen);
 
                         controller.createPlan(maintenancePlan, id, kennzeichen);
 
@@ -423,12 +456,12 @@ public class LDQueryActivity {
                 }
 
 
-            } else if (message.what == 80) { //getNodeID
+            } else if (message.what == 80) {
                 Log.i("what", "80");
 
                 Bundle resultBundle = message.getData();
                 String result = resultBundle.getString("result");
-                Log.i("normal", " "+ resultBundle.getString("maintenancePlan")+" "+resultBundle.getString("id")+" "+resultBundle.getString("kennzeichen")+" "+resultBundle.getString("workingstep"));
+                Log.i("normal", " " + resultBundle.getString("maintenancePlan") + " " + resultBundle.getString("id") + " " + resultBundle.getString("kennzeichen") + " " + resultBundle.getString("workingstep"));
 
                 if (null == result)
                     result = "No Result received!";
@@ -454,14 +487,14 @@ public class LDQueryActivity {
                         String kennzeichen = c.getJSONObject("kennzeichen")
                                 .getString("value")
                                 .replaceFirst("^.*#", "");
-                        String workingLink = c.getJSONObject("workingstep")
+                        String workingstep = c.getJSONObject("workingstep")
                                 .getString("value")
                                 .replaceFirst("^.*#", "");
 
 
+                        controller.saveStep(maintenancePlan, id, workingstep);
 
-                        controller.saveStep(maintenancePlan,id, workingLink);
-
+                        controller.makeToast("loading Working Steps");
 
                         //TODO call something
                         //fill list
@@ -472,11 +505,11 @@ public class LDQueryActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                     Log.i("error", e.getMessage());
-                    Log.i("error", " "+ resultBundle.getString("maintenancePlan")+" "+resultBundle.getString("id")+" "+resultBundle.getString("kennzeichen")+" "+resultBundle.getString("workingstep"));
+                    Log.i("error", " " + resultBundle.getString("maintenancePlan") + " " + resultBundle.getString("id") + " " + resultBundle.getString("kennzeichen") + " " + resultBundle.getString("workingstep"));
                 }
 
 
-            }else if (message.what == 70) { //getNodeID
+            } else if (message.what == 70) {
                 Log.i("what", "70");
 
                 Bundle resultBundle = message.getData();
@@ -504,7 +537,7 @@ public class LDQueryActivity {
                         String kennzeichen = c.getJSONObject("kennzeichen")
                                 .getString("value")
                                 .replaceFirst("^.*#", "");
-                        String workingLink = c.getJSONObject("workingstep")
+                        String workingstep = c.getJSONObject("workingstep")
                                 .getString("value")
                                 .replaceFirst("^.*#", "");
                         String workinglabel = c.getJSONObject("workinglabel")
@@ -512,9 +545,62 @@ public class LDQueryActivity {
                                 .replaceFirst("^.*#", "");
 
 
-                        controller.saveWorkingLabel(maintenancePlan, workingLink, workinglabel);
+                        controller.saveWorkingLabel(maintenancePlan, workingstep, workinglabel);
 
 
+                        controller.makeToast("loading Working Title");
+                        //TODO fill controller List
+                        //fill list
+                        //listItems.add(p);
+
+
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Log.i("error", e.getMessage());
+                }
+
+
+            } else if (message.what == 60) { //getNodeID
+                Log.i("what", "60");
+
+                Bundle resultBundle = message.getData();
+                String result = resultBundle.getString("result");
+                if (null == result)
+                    result = "No Result received!";
+                try {
+                    //parse result JSON string into JSON Object
+
+                    JSONObject results = new JSONObject(result);
+                    //Create JSON Array out of JSONObject
+                    JSONArray titles = results.getJSONObject("results")
+                            .getJSONArray("bindings");
+                    for (int i = 0; i < titles.length(); i++) {
+                        JSONObject c = titles.getJSONObject(i);
+                        String s = c.getJSONObject("s")
+                                .getString("value")
+                                .replaceFirst("^.*#", "");
+                        String maintenancePlan = c.getJSONObject("maintenancePlan")
+                                .getString("value")
+                                .replaceFirst("^.*#", "");
+                        String id = c.getJSONObject("id")
+                                .getString("value")
+                                .replaceFirst("^.*#", "");
+                        String kennzeichen = c.getJSONObject("kennzeichen")
+                                .getString("value")
+                                .replaceFirst("^.*#", "");
+                        String workingstep = c.getJSONObject("workingstep")
+                                .getString("value")
+                                .replaceFirst("^.*#", "");
+                        String possStatLab = c.getJSONObject("possStatLab")
+                                .getString("value")
+                                .replaceFirst("^.*#", "");
+
+
+                        Log.i("60", possStatLab + " " + maintenancePlan + " " + workingstep);
+                        controller.savePossibleStat(maintenancePlan, workingstep, possStatLab);
+
+                        controller.makeToast("loading Possible Status");
                         //TODO fill controller List
                         //fill list
                         //listItems.add(p);
@@ -528,6 +614,8 @@ public class LDQueryActivity {
 
 
             }
+
+
         }
     }
 

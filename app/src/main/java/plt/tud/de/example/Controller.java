@@ -29,6 +29,7 @@ public class Controller {
     static String currentMaintenanceStep = "";
     static StartActivity start;
 
+    private long timer = 0;
 
     public Controller() {
     }
@@ -39,6 +40,19 @@ public class Controller {
 
     //TODO start this with createLD("getMaintenancePlan","","",""); anywhere
     public void createLD(String requestedData, String plan, String tourID, String workingStep) {
+        //reset possibleStatusList in current workingsteps before getting new ones
+        if (requestedData.equals("getPossibleStatus")) {
+            for (Plan plans : planList) {
+                if (plans.getMaintenancePlan().equals(currentPlan)) {
+                    ArrayList<WorkingStep> steps = plans.getStepList();
+                    for (WorkingStep step : steps) {
+                        Log.i("reset", " " + step.getWorkingLabel());
+                        step.resetPossibleStatusList();
+                    }
+
+                }
+            }
+        }
         LDA.createLD(requestedData, plan, tourID, workingStep);
     }
 
@@ -51,7 +65,7 @@ public class Controller {
      */
     public void createPlan(String maintenancePlan, String tourID, String kennzeichen) {
         for (Plan existingPlan : planList) {
-            if (existingPlan.getMaintenancePlan() == maintenancePlan) {
+            if (existingPlan.getMaintenancePlan().equals(maintenancePlan)) {
                 return;
             }
         }
@@ -116,15 +130,11 @@ public class Controller {
     }
 
     public void setCurrentPlan(String currentPlan) {
-        this.currentPlan = currentPlan;
-    }
+        //TODO add last linked Data call
 
-    //TODO delete
-    public String getString(int place) {
-        Plan plan;
-        plan = planList.get(place);
-        String stringShow = plan.getString();
-        return stringShow;
+        this.currentPlan = currentPlan;
+        Log.i("create LD", "getPossibleStatus");
+        createLD("getPossibleStatus", currentPlan, currentTour, "");
     }
 
 
@@ -135,7 +145,6 @@ public class Controller {
         navigationDrawerList = new ArrayList<String>();
         navigationDrawerList.add("Tour");
         tourList = new ArrayList<>();
-
 
 
         for (Plan plan : planList) {
@@ -343,7 +352,9 @@ public class Controller {
                             p.check();                      //check this plan
                         }
                     }
-                    currentPlan = maintenanceList.get(counter + 1);           //current plan = next plan
+
+                    setCurrentPlan(maintenanceList.get(counter + 1)); //current plan = next plan
+                    //currentPlan =
 
                     main.callpage(0);
                     return;
@@ -359,7 +370,8 @@ public class Controller {
                             Log.i("current Tour", " " + tourList.get(tourCounter).getName());
                             Log.i("next Tour", " " + tourList.get(tourCounter + 1).getName());
                             changeNavDToMaintenanceList();
-                            currentPlan = maintenanceList.get(1);
+                            setCurrentPlan(maintenanceList.get(1)); //current plan = first plan
+                            //currentPlan = maintenanceList.get(1);
                             main.callpage(0);
                             return;
                         }
@@ -371,7 +383,8 @@ public class Controller {
 
                         currentTour = tourList.get(0).getName();        //current Tour = first
                         changeNavDToMaintenanceList();
-                        currentPlan = maintenanceList.get(1);
+                        setCurrentPlan(maintenanceList.get(1));         //current plan = first plan
+                        //currentPlan = maintenanceList.get(1);
 
                         main.callpage(0);
 
@@ -405,5 +418,31 @@ public class Controller {
         return false;
     }
 
+
+    public void savePossibleStat(String maintenancePlan, String workingstep, String possStatLab) {
+        for (Plan plans : planList) {
+            if (plans.getMaintenancePlan().equals(maintenancePlan)) {
+                plans.savePossibleStat(workingstep, possStatLab);
+
+            }
+        }
+
+    }
+
+
+    public void makeToast(String text) {
+
+        long t = System.currentTimeMillis();
+        //every 2 sec a new Toast
+        if (t - timer > 2000) {
+            timer = t;
+
+            if (main.isActive)
+                main.makeToast(text);
+            if (start.isActive) {
+                start.makeToast(text);
+            }
+        }
+    }
 
 }

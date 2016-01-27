@@ -14,6 +14,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +28,10 @@ public class StartActivity extends AppCompatActivity {
     Controller controller = new Controller();
     ListView tourList;
     static boolean init = false;
+    StartActivity start =this;
+
+    private long timer = 0;
+    int screen = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,16 +56,25 @@ public class StartActivity extends AppCompatActivity {
                 if (controller.checkTour(text.getText().toString())) { //if tour is clicked
                     controller.changeNavDToMaintenanceList(text.getText().toString());
                     controller.setCurrentTour(text.getText().toString());
+                    screen=1;
                     Log.i("current Tour", text.getText().toString());
                 } else if (position == 0) {                             //if back is clicked
                     controller.setNavList();
+                    screen=0;
                 } else {
                     controller.setCurrentPlan(text.getText().toString());
                     Log.i("current Plan", text.getText().toString());
-                    Intent intent = new Intent(getBaseContext(), MainActivity.class);
 
-                    startActivity(intent);
 
+
+                    long t = System.currentTimeMillis();
+                    if (t - timer > 5000) {    // time from last toast to now
+                        Intent intent = new Intent(getBaseContext(), MainActivity.class);
+                        startActivity(intent);
+                    }else {
+                        makeToastNoTime("still loading");
+
+                    }
                 }
 
 
@@ -92,15 +106,23 @@ public class StartActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Are you sure you want to close the app?").setCancelable(true).
-                setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        StartActivity.super.onBackPressed();
-                    }
-                });
-        AlertDialog alert = builder.create();
-        alert.show();
+        if(screen == 0) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("Are you sure you want to close the app?").setCancelable(true).
+                    setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            StartActivity.super.onBackPressed();
+                        }
+                    });
+            AlertDialog alert = builder.create();
+            alert.show();
+        }else{
+            controller.setNavList();
+            screen=0;
+
+        }
+
+
 
     }
 
@@ -140,5 +162,31 @@ public class StartActivity extends AppCompatActivity {
             }
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+
+
+
+    public void makeToastNoTime(String text) {
+        final String txt = text;
+
+        this.runOnUiThread(new Runnable() {
+            public void run() {
+                Toast.makeText(start, txt, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+
+    public void makeToast(String text) {
+        final String txt = text;
+        timer = System.currentTimeMillis();
+
+        this.runOnUiThread(new Runnable() {
+            public void run() {
+                Toast.makeText(start, txt, Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 }

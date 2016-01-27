@@ -17,22 +17,6 @@
         android:layout_gravity="center_horizontal"
         android:text="implementation" />
 
-    <Button
-        android:id="@+id/button_implementation_ok"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:onClick="onButtonClicked"
-        android:text="@string/ok" />
-
-    <Button
-        android:id="@+id/button_implementation_cancel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:onClick="onButtonClicked"
-        android:text="@string/cancel" />
-
     <ListView
         android:id="@+id/listView_implementation"
         android:layout_width="wrap_content"

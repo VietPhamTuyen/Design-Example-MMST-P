@@ -71,4 +71,13 @@ public class Plan {
     }
 
 
+
+
+    public void savePossibleStat(String workingstep, String possStatLab){
+        for(WorkingStep step : workingStepList){
+            if(step.getStepLink().equals(workingstep)){
+                step.savePossibleStatus(possStatLab);
+            }
+        }
+    }
 }
