@@ -232,7 +232,6 @@ public class Controller {
         }
 
 
-        workingStepStringList.add("Tour: " + currentTour + "| Plan: " + currentPlan + "| " + check);
         Log.i("currentPlan", " " + currentPlan + " " + check);
         for (Plan p : planList) {
             // Log.i("plan", " "+ p.getMaintenancePlan());

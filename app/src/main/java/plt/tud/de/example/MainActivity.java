@@ -21,9 +21,12 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.MenuItem;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -48,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
     private ListView mDrawer;
+    android.support.v7.app.ActionBar actionBar;
 
     private Context mContext = null;
     public static LDQueryActivity LD = new LDQueryActivity();
@@ -81,6 +85,12 @@ public class MainActivity extends AppCompatActivity implements
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+
+        actionBar = getSupportActionBar();
+
+        actionBar.setDisplayHomeAsUpEnabled(false);
+
+
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), this);
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
@@ -104,14 +114,20 @@ public class MainActivity extends AppCompatActivity implements
                 R.string.drawer_close   /* "close drawer" description for accessibility */
         ) {
             public void onDrawerClosed(View view) {
-                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+                Log.i("onDrawerClosed", "close");
+                super.onDrawerClosed(view);
+             //   invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
 
             public void onDrawerOpened(View drawerView) {
-                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+                Log.i("onDrawerOpened", "open");
+                super.onDrawerOpened(drawerView);
+            //    invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 
         //show all found tours in the navigationDrawer
         controller.setNavList();
@@ -131,6 +147,7 @@ public class MainActivity extends AppCompatActivity implements
                 Log.i("tab position", String.valueOf(position));
                 //save current tab position
                 tabPosition = position;
+                currentPage = position;
                 if (tabPosition == 0) {
                     changeListTask();
                 } else if (tabPosition == 1) {
@@ -151,35 +168,10 @@ public class MainActivity extends AppCompatActivity implements
 
             }
         });
-/**
-        mViewPager.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (tabPosition == 3) {
-                    switch (event.getAction()) {
 
 
-                        case MotionEvent.ACTION_DOWN:
-                            x1 = event.getX();
-                            break;
-                        case MotionEvent.ACTION_UP:
-                            x2 = event.getX();
-                            float deltaX = x1 - x2;
-                            if ((deltaX) > MIN_DISTANCE) {
-                                switchToast();
-                                controller.nextPlan();
 
 
-                            } else {
-                                // consider as something else - a screen tap for example
-                            }
-                            break;
-                    }
-                }
-                return false;
-            }
-        });
-*/
 
         controller.changeNavDToMaintenanceList();
 
@@ -192,6 +184,105 @@ public class MainActivity extends AppCompatActivity implements
         setTitleName();
 
     }
+
+
+    /**
+     * keycode - event.keycode - input "Kurzbeschreibung_Dreh-Drueckstelle_HID.pdf" page 2
+     * 111 - KEYCODE_ESCAPE 8
+     * 19 - KEYCODE_DPAD_UP 3     -> 47 - KEYCODE_W
+     * 20 - KEYCODE_DPAD_DOWN 4   -> 51 - KEYCODE_S
+     * 21 - KEYCODE_DPAD_LEFT 2   -> 29 - KEYCODE_A
+     ** 22 - KEYCODE_DPAD_RIGHT 5 -> 32 - KEYCODE_D
+     * 67 - KEYCODE_DEL 6
+     * 112 - KEYCODE_FORWARD_DEL 7
+     *x
+     * @param keyCode
+     * @param event
+     * @return
+     */
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        Log.i("key", "----------------------------");
+        Log.i("Keycode", " "+ String.valueOf(keyCode));
+        Log.i("Keyevent", " "+ event.toString());
+
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_ENTER:{
+                return super.onKeyDown(keyCode, event);
+            }
+
+            case KeyEvent.KEYCODE_DPAD_LEFT:{
+                if(currentPage == 0){
+                    mDrawerLayout.openDrawer(GravityCompat.START);
+                }else if(!(currentPage == 0)){
+                    set_currentPage(currentPage - 1);
+                }
+
+                return false;
+            }
+
+            case KeyEvent.KEYCODE_DPAD_RIGHT:{
+
+                if(mDrawerLayout.isDrawerOpen(Gravity.LEFT)){
+                    mDrawerLayout.closeDrawers();
+
+                }else if(!(currentPage == 3)){
+                    set_currentPage(currentPage + 1);
+                }else if(currentPage == 3){
+                    controller.nextPlan();
+                    setTitleName();
+                }
+
+                return false;
+
+            }
+            case KeyEvent.KEYCODE_DPAD_UP:{
+           //     if(mDrawerLayout.isDrawerOpen(GravityCompat.START)){
+                    super.onKeyDown(keyCode, event);
+
+            }
+            case KeyEvent.KEYCODE_DPAD_DOWN:{
+             //   if(mDrawerLayout.isDrawerOpen(GravityCompat.START)){
+
+                    super.onKeyDown(keyCode, event);
+            }
+            case KeyEvent.KEYCODE_DEL:{
+                return super.onKeyDown(keyCode, event);
+
+            }
+            case KeyEvent.KEYCODE_BACK:{
+                onBackPressed();
+                return super.onKeyDown(keyCode, event);
+            }
+            case KeyEvent.KEYCODE_ESCAPE:{
+                onBackPressed();
+                return super.onKeyDown(keyCode, event);
+            }
+
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_ENTER:{
+                this.getCurrentFocus().clearFocus();
+                return false;
+            }
+            case KeyEvent.KEYCODE_DPAD_LEFT: {
+                this.getCurrentFocus().clearFocus();
+                return false;
+            }
+            case KeyEvent.KEYCODE_DPAD_RIGHT: {
+                this.getCurrentFocus().clearFocus();
+                return false;
+            }
+        }
+        return true;
+    }
+
+
 
     public void switchToast(){
         Toast.makeText(this, "Switch to next maintenanceplan", Toast.LENGTH_SHORT).show();
@@ -242,9 +333,11 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Log.i("home", "home");
         if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -252,10 +345,11 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onBackPressed() {
 
+
         if (mViewPager.getCurrentItem() == 0) {
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage("Are you sure you want to go back?").setCancelable(true).
+            builder.setMessage("Are you sure you want to close the app?").setCancelable(true).
                     setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             MainActivity.super.onBackPressed();

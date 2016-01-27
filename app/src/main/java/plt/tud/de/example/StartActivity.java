@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -92,7 +93,7 @@ public class StartActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Are you sure you want to close the app?").setCancelable(false).
+        builder.setMessage("Are you sure you want to close the app?").setCancelable(true).
                 setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         StartActivity.super.onBackPressed();
@@ -128,5 +129,16 @@ public class StartActivity extends AppCompatActivity {
     }
     // TODO http://developer.android.com/training/keyboard-input/navigation.html
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
 
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_ENTER:
+            {
+                //your Action code
+               // return true;
+            }
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 }
