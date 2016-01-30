@@ -1,6 +1,5 @@
 package plt.tud.de.example;
 
-import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -25,7 +24,7 @@ import java.util.List;
 public class StartActivity extends AppCompatActivity {
 
     static boolean isActive = false;
-    Controller controller = new Controller();
+    static Controller controller = new Controller();
     ListView tourList;
     static boolean init = false;
     StartActivity start =this;
@@ -53,7 +52,7 @@ public class StartActivity extends AppCompatActivity {
                     init = true;
                 }
 
-                if (controller.checkTour(text.getText().toString())) { //if tour is clicked
+                if (controller.checkIfTour(text.getText().toString())) { //if tour is clicked
                     controller.changeNavDToMaintenanceList(text.getText().toString());
                     controller.setCurrentTour(text.getText().toString());
                     screen=1;
@@ -83,7 +82,7 @@ public class StartActivity extends AppCompatActivity {
 
 
 
-        controller.createLD("getMaintenancePlan", "", "", ""); //TODO
+        controller.createLD("getMaintenancePlan", "", "C1", ""); //TODO
 
         controller.updateStartActivity(this);
 

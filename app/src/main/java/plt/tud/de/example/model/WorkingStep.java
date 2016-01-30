@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class WorkingStep {
     String stepLink;
     String workingLabel;
-    ArrayList<String> possibleStatusList = new ArrayList<>();
+    ArrayList<Status> possibleStatusList = new ArrayList<>();
 
 
 
@@ -36,11 +36,12 @@ public class WorkingStep {
 
     }
 
-    public void savePossibleStatus(String possibleStatus){
+    public void savePossibleStatus(String possibleStatusName){
+        Status possibleStatus= new Status(possibleStatusName);
         possibleStatusList.add(possibleStatus);
     }
 
-    public ArrayList<String> getPossibleStatusList(){
+    public ArrayList<Status> getPossibleStatusList(){
         return possibleStatusList;
     }
 

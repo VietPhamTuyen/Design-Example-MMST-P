@@ -18,7 +18,7 @@ import plt.tud.de.example.R;
  * Created by Viet on 05.01.2016.
  */
 public class Fragment_Implementation extends Fragment {
-    Controller controller = new Controller();
+    static Controller controller = new Controller();
 
 
     @Override

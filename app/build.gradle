@@ -7,7 +7,7 @@ android {
     useLibrary 'org.apache.http.legacy'
 
     defaultConfig {
-        applicationId "plt.tud.de.opcua_connect"
+        applicationId "plt.tud.de.opcua_connect2"
         minSdkVersion 15
         targetSdkVersion 23
         versionCode 1

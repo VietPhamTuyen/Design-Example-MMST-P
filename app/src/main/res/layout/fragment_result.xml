@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#6889fd">
+    android:weightSum="1">
     <TextView
         android:id="@+id/section_label"
         android:layout_width="wrap_content"
@@ -21,5 +21,9 @@
         android:layout_gravity="center_horizontal"
         android:onClick="onButtonClicked"
         android:text="@string/ok" />
-
+    <ListView
+        android:id="@+id/listView_result"
+        android:layout_width="wrap_content"
+        android:layout_height="383dp"
+        android:layout_weight="0.76" />
 </LinearLayout>

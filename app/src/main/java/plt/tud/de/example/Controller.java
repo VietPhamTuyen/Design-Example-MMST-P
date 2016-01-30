@@ -5,6 +5,7 @@ import android.util.Log;
 import java.util.ArrayList;
 
 import plt.tud.de.example.model.Plan;
+import plt.tud.de.example.model.Status;
 import plt.tud.de.example.model.Tour;
 import plt.tud.de.example.model.WorkingStep;
 
@@ -15,21 +16,23 @@ public class Controller {
 
     // static ArrayList<String> tourList = new ArrayList<String>();
     static ArrayList<Tour> tourList = new ArrayList<>();
-    static ArrayList<String> navigationDrawerList = new ArrayList<String>();    //Nav Drawer Tour, C1,C2,C3...
-    static ArrayList<String> maintenanceList = new ArrayList<String>();         //plan list for currentTour
-    static ArrayList<String> workingStepStringList = new ArrayList<String>();       //Workingsteps for currentPlan
+    static ArrayList<String> navigationDrawerList = new ArrayList<String>();       //Nav Drawer Tour, C1,C2,C3...
+    static ArrayList<String> maintenanceList = new ArrayList<String>();                 //plan list for currentTour
+    static ArrayList<String> workingStepStringList = new ArrayList<String>();      //Workingsteps for currentPlan
 
     static String currentTour = "";
     static String currentKennzeichen = "";
     static String currentPlan = "";
+    static String currentMaintenanceStep = "";
 
     static ArrayList<Plan> planList = new ArrayList<Plan>();                //every single plan, no order
-    static LDQueryActivity LDA = new LDQueryActivity();
+    static LDQuery LDA = new LDQuery();
     static MainActivity main;
-    static String currentMaintenanceStep = "";
     static StartActivity start;
 
-    private long timer = 0;
+    static long timer = 0;
+
+    static ArrayList<String> writeLDList = new ArrayList<>();
 
     public Controller() {
     }
@@ -57,7 +60,7 @@ public class Controller {
     }
 
     /**
-     * call in LDQueryActivity if a new item from Linked Data is found
+     * call in LDQuery if a new item from Linked Data is found
      *
      * @param maintenancePlan
      * @param tourID
@@ -262,11 +265,11 @@ public class Controller {
      * @param tour_check
      * @return
      */
-    public boolean checkTour(String tour_check) {
+    public boolean checkIfTour(String tour_check) {
         for (Tour tour : tourList) {
             if (tour.getName().equals(tour_check)) {
                 //save currentTour
-                Log.i("checkTour", "current Tour: " + tour_check);
+                Log.i("checkIfTour", "current Tour: " + tour_check);
                 currentTour = tour_check;
                 return true;
             }
@@ -284,6 +287,27 @@ public class Controller {
         ArrayList<String> currentTask = new ArrayList<>();
         currentTask.add(currentKennzeichen);
         return currentTask;
+    }
+
+
+    public ArrayList<String> showCurrentResult() {
+        ArrayList<String> currentResult = new ArrayList<>();
+        for (Plan plan : planList) {
+            if (currentPlan.equals(plan.getMaintenancePlan())) {
+                ArrayList<WorkingStep> workingStepList = plan.getStepList();
+
+                for (WorkingStep step : workingStepList) {
+                    ArrayList<Status> possibleStepList = step.getPossibleStatusList();
+
+                    for (Status posStatus : possibleStepList) {
+                        String stepName = posStatus.getStatusName();
+                        currentResult.add(step.getWorkingLabel() + ":\n " + stepName);
+                    }
+                }
+            }
+        }
+
+        return currentResult;
     }
 
 
@@ -443,6 +467,10 @@ public class Controller {
                 start.makeToast(text);
             }
         }
+    }
+
+    public void addLDwriteList(String text){
+        writeLDList.add(text);
     }
 
 }

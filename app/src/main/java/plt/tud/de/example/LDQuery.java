@@ -25,19 +25,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.AlertDialog;
-import android.app.ListActivity;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import org.apache.http.auth.AuthScope;
@@ -45,15 +39,15 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 
 
 @SuppressWarnings("ALL")
-public class LDQueryActivity {
+public class LDQuery {
     Handler handler;
 
     // intent extra parameters and their defaults
-    String uri = "http://eatld.et.tu-dresden.de/mti-mmst2015_g2_1";
-    String endpoint = "http://eatld.et.tu-dresden.de/sparql-auth";
+    static String uri = "http://eatld.et.tu-dresden.de/mti-mmst2015_g2_1";
+    static String endpoint = "http://eatld.et.tu-dresden.de/sparql-auth";
 
-    static String sparql_username = "mmst2015_g2_1";
-    static String sparql_password = "mmst2015_g2_1";
+    private static String sparql_username = "mmst2015_g2_1";
+    private static String sparql_password = "mmst2015_g2_1";
 
     private static UsernamePasswordCredentials credentials;
 
@@ -64,7 +58,7 @@ public class LDQueryActivity {
     static MainActivity main;
 
     static Controller controller = new Controller();
-//TODO synch?
+    //TODO synch?
 
     public static void LDQueryActivity() {
 
@@ -83,7 +77,7 @@ public class LDQueryActivity {
      * @param uri String - the URI of the sensor (without <>)
      * @return the sparql query (String)
      */
-    public String composeQuery(String uri, String requestedData, String plan, String tourID, String workingStep) {
+    public String composeQuery(String requestedData, String plan, String tourID, String workingStep) {
 
         String query = "";
         if (requestedData == "getMaintenancePlan") {
@@ -112,7 +106,7 @@ public class LDQueryActivity {
                     + "FILTER regex(?id, \"" + tourID + "\")"       //TODO
 
                     + "?s rdfs:label ?kennzeichen."
-                    + "}"
+                    + "}  LIMIT 3"
             ;
 
 
@@ -309,7 +303,7 @@ public class LDQueryActivity {
             //set up HTTP Post Request (look at http://virtuoso.openlinksw.com/dataspace/doc/dav/wiki/Main/VOSSparqlProtocol for Protocol)
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
             nameValuePairs.add(new BasicNameValuePair("format", "application/json"));
-            nameValuePairs.add(new BasicNameValuePair("query", composeQuery(uri, requestedData, plan, tourID, workingStep)));
+            nameValuePairs.add(new BasicNameValuePair("query", composeQuery( requestedData, plan, tourID, workingStep)));
             nameValuePairs.add(new BasicNameValuePair("default-graph-uri", null));
             nameValuePairs.add(new BasicNameValuePair("named-graph-uri", null));
 
@@ -320,7 +314,7 @@ public class LDQueryActivity {
             } catch (UnsupportedEncodingException e1) {
 
                 e1.printStackTrace();
-                Log.e(LDQueryActivity.class.getName(), e1.getMessage());
+                Log.e(LDQuery.class.getName(), e1.getMessage());
             }
             try { //Execute Query
                 HttpResponse response = httpClient.execute(request);
@@ -376,8 +370,8 @@ public class LDQueryActivity {
 
             } catch (IOException e) {
                 e.printStackTrace();
-                Log.e(LDQueryActivity.class.getName(), e.getMessage());
-                controller.makeToast(LDQueryActivity.class.getName()+ e.getMessage());
+                Log.e(LDQuery.class.getName(), e.getMessage());
+                controller.makeToast(LDQuery.class.getName()+ e.getMessage());
 				/*
                  * There may be no network connection or a timeout.
 				 * Show toast to let the user check connections.
@@ -494,7 +488,7 @@ public class LDQueryActivity {
 
                         controller.saveStep(maintenancePlan, id, workingstep);
 
-                        controller.makeToast("loading Working Steps");
+                        controller.makeToast("loading Working Steps\n"+ workingstep);
 
                         //TODO call something
                         //fill list
@@ -548,7 +542,7 @@ public class LDQueryActivity {
                         controller.saveWorkingLabel(maintenancePlan, workingstep, workinglabel);
 
 
-                        controller.makeToast("loading Working Title");
+                        controller.makeToast("loading Working Title \n"+ workinglabel);
                         //TODO fill controller List
                         //fill list
                         //listItems.add(p);

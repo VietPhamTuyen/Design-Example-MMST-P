@@ -5,15 +5,13 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.app.ActionBar.Tab;
 import android.app.ActionBar;
 
-import android.os.Handler;
-import android.os.Message;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.GravityCompat;
@@ -25,10 +23,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.MenuItem;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -47,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements
         ActionBar.TabListener {
 
 
-    static boolean isActive = false;
+    public static boolean isActive = false;
     private String[] drawerListViewItems;
 
     private DrawerLayout mDrawerLayout;
@@ -56,7 +52,6 @@ public class MainActivity extends AppCompatActivity implements
     android.support.v7.app.ActionBar actionBar;
 
     private Context mContext = null;
-    public static LDQueryActivity LD = new LDQueryActivity();
 
     ListView tweetList;
     ArrayAdapter<String> arrayAdapter;
@@ -71,8 +66,6 @@ public class MainActivity extends AppCompatActivity implements
 
     static Controller controller = new Controller();
 
-    private float x1, x2;
-    static final int MIN_DISTANCE = 150;
 
     MainActivity main = this;
 
@@ -182,9 +175,6 @@ public class MainActivity extends AppCompatActivity implements
         changeListReturn();
 
         setTitleName();
-
-
-
 
 
     }
@@ -312,17 +302,16 @@ public class MainActivity extends AppCompatActivity implements
     /**
      * refresh List in Navigation Drawer
      *
-     * @param incomingList
+     * @param incomingList ... inputList
      */
     public void setMenuView(ArrayList<String> incomingList) {
         //drawerListViewItems = getResources().getStringArray(R.array.items);
 
-        List<String> newString = incomingList;
 
-        drawerListViewItems = newString.toArray(new String[newString.size()]);
+        drawerListViewItems = incomingList.toArray(new String[incomingList.size()]);
 
         mDrawer = (ListView) findViewById(R.id.left_drawer);
-        mDrawer.setAdapter(new ArrayAdapter<String>(this,
+        mDrawer.setAdapter(new ArrayAdapter<>(this,
                 R.layout.list_item, drawerListViewItems));
 
     }
@@ -548,7 +537,36 @@ public class MainActivity extends AppCompatActivity implements
 
     //TODO
     public void changeListResult() {
+        ArrayList<String> CurrentResult = controller.showCurrentResult();
+        Log.i("debug", "getWorkingSteps");
 
+        String[] inputStringList = CurrentResult.toArray(new String[CurrentResult.size()]);
+
+        // ArrayAdapter<String> arrayAdapter_list = new ArrayAdapter<String>(this, R.layout.list_item, inputStringList);
+        if (CurrentResult.size() > 0) {
+            if (tabPosition == 3) {
+                ListView parameterList = (ListView) findViewById(R.id.listView_result);
+                parameterList.setAdapter(new ArrayAdapter<String>(this, R.layout.list_item, inputStringList));
+
+                parameterList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        TextView textView = (TextView) view;
+                        String text = textView.toString();
+
+                        Log.i("addLDwriteList", " " + text);
+                        textView.setTextColor(Color.BLUE);
+                        controller.addLDwriteList(text);
+
+                    }
+                });
+                ;
+
+            }
+        } else {
+            Toast.makeText(this, "to be loadet",
+                    Toast.LENGTH_LONG).show();
+        }
 
     }
 
@@ -576,7 +594,7 @@ public class MainActivity extends AppCompatActivity implements
         public void onItemClick(AdapterView parent, View view, int position, long id) {
             TextView text = (TextView) view;
 
-            if (controller.checkTour(text.getText().toString())) { //if tour is clicked
+            if (controller.checkIfTour(text.getText().toString())) { //if tour is clicked
                 controller.changeNavDToMaintenanceList(text.getText().toString());
                 controller.setCurrentTour(text.getText().toString());
             } else if (position == 0) {                             //if back is clicked
