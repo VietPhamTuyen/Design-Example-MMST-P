@@ -44,19 +44,28 @@ public class Controller {
     //TODO start this with createLD("getMaintenancePlan","","",""); anywhere
     public void createLD(String requestedData, String plan, String tourID, String workingStep) {
         //reset possibleStatusList in current workingsteps before getting new ones
+        boolean reload = true;
         if (requestedData.equals("getPossibleStatus")) {
             for (Plan plans : planList) {
                 if (plans.getMaintenancePlan().equals(currentPlan)) {
-                    ArrayList<WorkingStep> steps = plans.getStepList();
-                    for (WorkingStep step : steps) {
-                        Log.i("reset", " " + step.getWorkingLabel());
-                        step.resetPossibleStatusList();
+                    if(!plans.check) {
+                        ArrayList<WorkingStep> steps = plans.getStepList();
+                        for (WorkingStep step : steps) {
+                            Log.i("reset", " " + step.getWorkingLabel());
+                            step.resetPossibleStatusList();
+                        }
+                    }
+                    else{
+                        reload = false;
+                        break;
                     }
 
                 }
             }
         }
-        LDA.createLD(requestedData, plan, tourID, workingStep);
+        if(reload) {
+            LDA.createLD(requestedData, plan, tourID, workingStep);
+        }
     }
 
     /**
@@ -290,18 +299,16 @@ public class Controller {
     }
 
 
-    public ArrayList<String> showCurrentResult() {
-        ArrayList<String> currentResult = new ArrayList<>();
+    public ArrayList<Status> showCurrentResult() {
+        ArrayList<Status> currentResult = new ArrayList<>();
         for (Plan plan : planList) {
             if (currentPlan.equals(plan.getMaintenancePlan())) {
                 ArrayList<WorkingStep> workingStepList = plan.getStepList();
 
                 for (WorkingStep step : workingStepList) {
                     ArrayList<Status> possibleStepList = step.getPossibleStatusList();
-
                     for (Status posStatus : possibleStepList) {
-                        String stepName = posStatus.getStatusName();
-                        currentResult.add(step.getWorkingLabel() + ":\n " + stepName);
+                        currentResult.add(posStatus);
                     }
                 }
             }
@@ -472,5 +479,27 @@ public class Controller {
     public void addLDwriteList(String text){
         writeLDList.add(text);
     }
+
+
+    public void setStatuscheck(Status stat, boolean check){
+        for (Plan plan : planList){
+            if (plan.getMaintenancePlan().equals(currentPlan)) {
+                ArrayList<WorkingStep> currentWorkingStepList = plan.getStepList();
+
+                for (WorkingStep workingStep : currentWorkingStepList) {
+                    ArrayList<Status> statusList = workingStep.getPossibleStatusList();
+
+                    for(Status status : statusList){
+                        if(status == stat){
+                            stat.setCheck(check);
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+
+
 
 }

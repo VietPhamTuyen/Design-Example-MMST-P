@@ -5,7 +5,6 @@ import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.app.ActionBar.Tab;
 import android.app.ActionBar;
@@ -38,6 +37,7 @@ import plt.tud.de.example.fragments.Fragment_Implementation;
 import plt.tud.de.example.fragments.Fragment_Result;
 import plt.tud.de.example.fragments.Fragment_Return;
 import plt.tud.de.example.fragments.Fragment_Task;
+import plt.tud.de.example.model.Status;
 
 public class MainActivity extends AppCompatActivity implements
         ActionBar.TabListener {
@@ -493,7 +493,7 @@ public class MainActivity extends AppCompatActivity implements
                 if (tabPosition == 0) {
                     ListView parameterList = (ListView) findViewById(R.id.listView_task);
                     try {
-                        parameterList.setAdapter(new ArrayAdapter<String>(this, R.layout.list_item, inputStringList));
+                        parameterList.setAdapter(new ArrayAdapter<>(this, R.layout.list_item, inputStringList));
                     } catch (Exception e) {
 
                     }
@@ -537,30 +537,37 @@ public class MainActivity extends AppCompatActivity implements
 
     //TODO
     public void changeListResult() {
-        ArrayList<String> CurrentResult = controller.showCurrentResult();
+        ArrayList<Status> CurrentResult = controller.showCurrentResult();
         Log.i("debug", "getWorkingSteps");
 
-        String[] inputStringList = CurrentResult.toArray(new String[CurrentResult.size()]);
+        Status[] inputStringList = CurrentResult.toArray(new Status[CurrentResult.size()]);
 
         // ArrayAdapter<String> arrayAdapter_list = new ArrayAdapter<String>(this, R.layout.list_item, inputStringList);
         if (CurrentResult.size() > 0) {
             if (tabPosition == 3) {
                 ListView parameterList = (ListView) findViewById(R.id.listView_result);
-                parameterList.setAdapter(new ArrayAdapter<String>(this, R.layout.list_item, inputStringList));
+                parameterList.setAdapter(new ArrayAdapter<>(this, R.layout.list_item, inputStringList));
+
+
+                Status[] showList = CurrentResult.toArray(new Status[CurrentResult.size()]);
+
+                StatusAdapter adapter = new StatusAdapter(this, CurrentResult);
+
+
+                parameterList.setAdapter(adapter);
+
 
                 parameterList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        TextView textView = (TextView) view;
-                        String text = textView.toString();
+                    public void onItemClick(AdapterView<?> parent, View view, int position,
+                                            long id) {
 
-                        Log.i("addLDwriteList", " " + text);
-                        textView.setTextColor(Color.BLUE);
-                        controller.addLDwriteList(text);
+                        String item = ((TextView) view).getText().toString();
+
+                        Toast.makeText(getBaseContext(), item+" ", Toast.LENGTH_LONG).show();
 
                     }
                 });
-                ;
 
             }
         } else {

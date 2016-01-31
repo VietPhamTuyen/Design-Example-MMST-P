@@ -37,7 +37,7 @@ public class WorkingStep {
     }
 
     public void savePossibleStatus(String possibleStatusName){
-        Status possibleStatus= new Status(possibleStatusName);
+        Status possibleStatus= new Status(possibleStatusName,workingLabel);
         possibleStatusList.add(possibleStatus);
     }
 

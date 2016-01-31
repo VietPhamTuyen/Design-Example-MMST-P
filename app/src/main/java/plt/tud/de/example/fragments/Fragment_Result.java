@@ -6,13 +6,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import java.util.ArrayList;
 
 import plt.tud.de.example.Controller;
+import plt.tud.de.example.StatusAdapter;
 import plt.tud.de.example.R;
+import plt.tud.de.example.model.Status;
 
 /**
  * Created by Viet on 05.01.2016.
@@ -32,16 +33,24 @@ public class Fragment_Result extends Fragment {
 
 
         //ArrayList<String> listItem = new ArrayList<>();
-        ArrayList<String> listItem = controller.showCurrentResult();
+        ArrayList<Status> listItem = controller.showCurrentResult();
 
-        ArrayAdapter<String> arrayAdapter_list = new ArrayAdapter<>(getContext(), R.layout.list_item, listItem);
+       // ArrayAdapter<String> arrayAdapter_list = new ArrayAdapter<>(getContext(), R.layout.list_item, listItem);
         ListView parameterList = (ListView) view.findViewById(R.id.listView_result);
 
+
+
+
+        Status[] showList = listItem.toArray(new Status[listItem.size()]);
+
+        StatusAdapter adapter = new StatusAdapter(getActivity(), listItem);
         try {
-            parameterList.setAdapter(arrayAdapter_list);
-        } catch(Exception e){
+            parameterList.setAdapter(adapter);
+        } catch (Exception e) {
             Log.i("error fragmentTask", " " + e.getMessage());
         }
+
+
 
         return view;
 

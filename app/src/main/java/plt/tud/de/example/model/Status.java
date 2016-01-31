@@ -5,9 +5,11 @@ package plt.tud.de.example.model;
  */
 public class Status {
     String statusName;
+    String workingStep;
     boolean check = false;
 
-    public Status(String statusName) {
+    public Status(String statusName, String workingStep) {
+        this.workingStep = workingStep;
         this.statusName = statusName;
     }
 
@@ -21,5 +23,9 @@ public class Status {
 
     public String getStatusName(){
         return statusName;
+    }
+
+    public String getStepName(){
+        return workingStep;
     }
 }

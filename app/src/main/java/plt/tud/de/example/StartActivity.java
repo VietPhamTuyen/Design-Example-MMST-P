@@ -61,13 +61,13 @@ public class StartActivity extends AppCompatActivity {
                     controller.setNavList();
                     screen=0;
                 } else {
-                    controller.setCurrentPlan(text.getText().toString());
                     Log.i("current Plan", text.getText().toString());
 
 
 
                     long t = System.currentTimeMillis();
                     if (t - timer > 5000) {    // time from last toast to now
+                        controller.setCurrentPlan(text.getText().toString());
                         Intent intent = new Intent(getBaseContext(), MainActivity.class);
                         startActivity(intent);
                     }else {
