@@ -8,6 +8,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -17,6 +20,12 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import plt.tud.de.example.Adapter.PlanAdapter;
+import plt.tud.de.example.Adapter.TourAdapter;
+import plt.tud.de.example.model.Plan;
+import plt.tud.de.example.model.Tour;
+import plt.tud.de.example.showAppInformations.AppInformationActivity;
 
 /**
  * Created by Viet on 05.01.2016.
@@ -82,11 +91,9 @@ public class StartActivity extends AppCompatActivity {
 
 
 
-        controller.createLD("getMaintenancePlan", "", "C1", ""); //TODO
+        controller.createLD("getMaintenancePlan", "", "", ""); //TODO
 
         controller.updateStartActivity(this);
-
-
         setTitle(getResources().getText(R.string.app_name));
     }
 
@@ -120,9 +127,6 @@ public class StartActivity extends AppCompatActivity {
             screen=0;
 
         }
-
-
-
     }
 
 
@@ -187,5 +191,33 @@ public class StartActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.menu_about, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.settings) {
+            Intent intent2 = new Intent(start, AppInformationActivity.class);
+            intent2.putExtra("site", "settings");
+            startActivity(intent2);
+            return true;
+        }
+        if (id == R.id.about) {
+            Intent intent2 = new Intent(start, AppInformationActivity.class);
+            intent2.putExtra("site", "about");
+            startActivity(intent2);
+            return true;
+        }
+
+
+        return super.onOptionsItemSelected(item);
     }
 }

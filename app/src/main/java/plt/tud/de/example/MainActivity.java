@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.app.ActionBar.Tab;
@@ -22,10 +23,14 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,11 +38,17 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import plt.tud.de.example.Adapter.PlanAdapter;
+import plt.tud.de.example.Adapter.StatusAdapter;
+import plt.tud.de.example.Adapter.TourAdapter;
 import plt.tud.de.example.fragments.Fragment_Implementation;
 import plt.tud.de.example.fragments.Fragment_Result;
 import plt.tud.de.example.fragments.Fragment_Return;
 import plt.tud.de.example.fragments.Fragment_Task;
+import plt.tud.de.example.model.Plan;
 import plt.tud.de.example.model.Status;
+import plt.tud.de.example.model.Tour;
+import plt.tud.de.example.showAppInformations.AppInformationActivity;
 
 public class MainActivity extends AppCompatActivity implements
         ActionBar.TabListener {
@@ -165,14 +176,13 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
 
-
         controller.changeNavDToMaintenanceList();
 
 
         changeListTask();
         changeListImplementation();
-        changeListResult();
         changeListReturn();
+        changeListResult();
 
         setTitleName();
 
@@ -208,7 +218,9 @@ public class MainActivity extends AppCompatActivity implements
 
             case KeyEvent.KEYCODE_DPAD_LEFT: {
                 if (currentPage == 0) {
+
                     mDrawerLayout.openDrawer(GravityCompat.START);
+
                 } else if (!(currentPage == 0)) {
                     set_currentPage(currentPage - 1);
                 }
@@ -218,12 +230,13 @@ public class MainActivity extends AppCompatActivity implements
 
             case KeyEvent.KEYCODE_DPAD_RIGHT: {
 
-                if (mDrawerLayout.isDrawerOpen(Gravity.LEFT)) {
+                if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
                     mDrawerLayout.closeDrawers();
 
                 } else if (!(currentPage == 3)) {
                     set_currentPage(currentPage + 1);
-                } else if (currentPage == 3) {
+                } else { // current page == 3
+                    //TODO add dialog
                     controller.nextPlan();
 
                     setTitleName();
@@ -304,15 +317,37 @@ public class MainActivity extends AppCompatActivity implements
      *
      * @param incomingList ... inputList
      */
-    public void setMenuView(ArrayList<String> incomingList) {
+    public void setMenuViewTour(ArrayList<Tour> incomingList) {
+        if (incomingList.get(0) instanceof Tour) {
+
+        }
         //drawerListViewItems = getResources().getStringArray(R.array.items);
 
+        ListView parameterList = (ListView) findViewById(R.id.left_drawer);
+        //parameterList.setAdapter(new ArrayAdapter<>(this, R.layout.list_item, incomingList));
 
-        drawerListViewItems = incomingList.toArray(new String[incomingList.size()]);
+        if (!incomingList.get(0).getName().equals("Tour")) {
+            Tour tour = new Tour("Tour");
+            incomingList.add(0, tour);
+        }
 
-        mDrawer = (ListView) findViewById(R.id.left_drawer);
-        mDrawer.setAdapter(new ArrayAdapter<>(this,
-                R.layout.list_item, drawerListViewItems));
+        TourAdapter adapter = new TourAdapter(this, incomingList);
+        parameterList.setAdapter(adapter);
+
+    }
+
+
+    public void setMenuViewPlan(ArrayList<Plan> incomingList) {
+        //drawerListViewItems = getResources().getStringArray(R.array.items);
+
+        ListView parameterList = (ListView) findViewById(R.id.left_drawer);
+        //parameterList.setAdapter(new ArrayAdapter<>(this, R.layout.list_item, incomingList));
+
+        Plan zurueck = new Plan("zurueck", "zurueck", "zurueck");
+
+        incomingList.add(0, zurueck);
+        PlanAdapter adapter = new PlanAdapter(this, incomingList);
+        parameterList.setAdapter(adapter);
 
     }
 
@@ -342,6 +377,22 @@ public class MainActivity extends AppCompatActivity implements
         if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
+
+
+        int id = item.getItemId();
+        if (id == R.id.settings) {
+            Intent intent2 = new Intent(main, AppInformationActivity.class);
+            intent2.putExtra("site", "settings");
+            startActivity(intent2);
+            return true;
+        }
+        if (id == R.id.about) {
+            Intent intent2 = new Intent(main, AppInformationActivity.class);
+            intent2.putExtra("site", "about");
+            startActivity(intent2);
+            return true;
+        }
+
 
         return super.onOptionsItemSelected(item);
     }
@@ -378,7 +429,7 @@ public class MainActivity extends AppCompatActivity implements
      */
     public void linkedDataListInput(ArrayList<String> listItem) {
 
-        arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, listItem);
+        arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, listItem);
         tweetList = (ListView) this.findViewById(R.id.linkedDataList);
         tweetList.setAdapter(arrayAdapter);
 
@@ -400,6 +451,7 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.button_result_ok:
                 switchToast();
                 Log.i("button", "button_result_ok");
+                //TODO add dialog
                 controller.nextPlan();
                 setTitleName();
                 break;
@@ -546,28 +598,11 @@ public class MainActivity extends AppCompatActivity implements
         if (CurrentResult.size() > 0) {
             if (tabPosition == 3) {
                 ListView parameterList = (ListView) findViewById(R.id.listView_result);
-                parameterList.setAdapter(new ArrayAdapter<>(this, R.layout.list_item, inputStringList));
-
-
-                Status[] showList = CurrentResult.toArray(new Status[CurrentResult.size()]);
+                // parameterList.setAdapter(new ArrayAdapter<>(this, R.layout.list_item, inputStringList));
 
                 StatusAdapter adapter = new StatusAdapter(this, CurrentResult);
-
-
                 parameterList.setAdapter(adapter);
 
-
-                parameterList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position,
-                                            long id) {
-
-                        String item = ((TextView) view).getText().toString();
-
-                        Toast.makeText(getBaseContext(), item+" ", Toast.LENGTH_LONG).show();
-
-                    }
-                });
 
             }
         } else {
@@ -599,31 +634,60 @@ public class MainActivity extends AppCompatActivity implements
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView parent, View view, int position, long id) {
-            TextView text = (TextView) view;
-
-            if (controller.checkIfTour(text.getText().toString())) { //if tour is clicked
-                controller.changeNavDToMaintenanceList(text.getText().toString());
-                controller.setCurrentTour(text.getText().toString());
-            } else if (position == 0) {                             //if back is clicked
-                controller.setNavList();
-            } else {
-                controller.setCurrentPlan(text.getText().toString());
-                setTitleName();
+            try {
 
 
-                changeListTask();
-                changeListImplementation();
-                changeListReturn();
-                changeListResult();
+                LinearLayout layout = (LinearLayout) view;
+                CheckBox checkBox = (CheckBox) layout.findViewById(R.id.checkBox1);
+                changeView(checkBox);
 
-                mDrawerLayout.closeDrawers();
+            } catch (Exception e) {
+                Log.i("error", " " + e.getMessage());
 
-
-                // controller.setNavList(); // have to show positions?
             }
 
+        }
+    }
+
+
+    /*
+     *
+     */
+    public void changeView(CheckBox checkBox) throws Exception {
+        /**
+         CheckBox checkBox = new CheckBox(mContext);
+         if(view instanceof LinearLayout) {
+         LinearLayout layout = (LinearLayout) view;
+         checkBox = (CheckBox) layout.findViewById(R.id.checkBox1);
+         }else if(view instanceof CheckBox){
+
+         }else {
+         throw new Exception();
+         }
+         */
+        Log.i("changeView", "show checkboxtext " + checkBox.getText());
+        if (controller.checkIfTour(checkBox.getText().toString())) {             //if tour is clicked
+            if (!checkBox.getText().toString().equals("Tour")) {
+                controller.changeNavDToMaintenanceList(checkBox.getText().toString());
+                controller.setCurrentTour(checkBox.getText().toString());
+            }
+        } else if (checkBox.getText().equals("zurueck")) {                       //if back is clicked
+            controller.setNavList();                                            //change to Tour List
+        } else {
+            controller.setCurrentPlan(checkBox.getText().toString());
+            setTitleName();
+
+
+            changeListTask();
+            changeListImplementation();
+            changeListReturn();
+            changeListResult();
+
+            mDrawerLayout.closeDrawers();
 
         }
+
+
     }
 
     @Override
@@ -669,5 +733,14 @@ public class MainActivity extends AppCompatActivity implements
         Log.i("main", "onPause");
         isActive = false;
     }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.menu_about, menu);
+        return true;
+    }
+
 
 }

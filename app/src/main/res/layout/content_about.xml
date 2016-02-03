@@ -14,6 +14,24 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:text="@string/about_appinfo2"
         android:id="@+id/about_text2" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:text="@string/about_appinfo3"
+        android:id="@+id/about_appinfo3" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:text="@string/about_appinfo4"
+        android:id="@+id/about_text4" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:text="@string/about_appinfo5"
+        android:id="@+id/about_text5" />
 
     <LinearLayout
         android:orientation="horizontal"

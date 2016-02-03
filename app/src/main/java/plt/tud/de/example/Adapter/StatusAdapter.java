@@ -1,4 +1,4 @@
-package plt.tud.de.example;
+package plt.tud.de.example.Adapter;
 
 import android.app.Activity;
 import android.content.Context;
@@ -13,6 +13,8 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import plt.tud.de.example.Controller;
+import plt.tud.de.example.R;
 import plt.tud.de.example.model.Status;
 
 /**
@@ -64,7 +66,7 @@ public class StatusAdapter extends ArrayAdapter {
                     CheckBox cb = (CheckBox) v;
                     Status _state = (Status) cb.getTag();
 
-                    Log.i("checkbox", "Clicked on Checkbox: " + cb.getText() + " is " + cb.isChecked());
+                   // Log.i("checkbox", "Clicked on Checkbox: " + cb.getText() + " is " + cb.isChecked());
 
                     _state.setCheck((cb.isChecked()));
                 }
@@ -91,5 +93,6 @@ public class StatusAdapter extends ArrayAdapter {
 
 
 
-//Log.i("stat",statusItem[position].getStatusName());
-//        controller.setStatuscheck(statusItem[position], true);
+
+
+

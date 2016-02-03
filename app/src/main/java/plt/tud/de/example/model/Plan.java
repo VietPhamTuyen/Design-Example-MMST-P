@@ -73,10 +73,10 @@ public class Plan {
 
 
 
-    public void savePossibleStat(String workingstep, String possStatLab){
+    public void savePossibleStat(String workingstep, String possStatLab, String planaddress){
         for(WorkingStep step : workingStepList){
             if(step.getStepLink().equals(workingstep)){
-                step.savePossibleStatus(possStatLab);
+                step.savePossibleStatus(possStatLab,planaddress);
             }
         }
     }

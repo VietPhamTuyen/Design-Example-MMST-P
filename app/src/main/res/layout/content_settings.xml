@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/abc_text_size_title_material"
+        android:textColor="#0B2A51"
+        android:text="@string/pref_category_linkedData_connection"
+        android:layout_marginLeft="24dp"
+        android:layout_marginTop="15dp" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/material_grey_900"
+        android:textSize="@dimen/abc_text_size_subtitle_material_toolbar"
+        android:text="@string/pref_title_linkedData_endpoint"
+        android:layout_marginLeft="24dp"
+        android:layout_marginTop="10dp" />
+    <TextView
+        android:id="@+id/action_setLDEndpoint"
+        android:textColor="#565252"
+        android:textSize="@dimen/abc_text_size_subtitle_material_toolbar"
+        android:layout_width="match_parent"
+        android:textStyle="italic"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="24dp"
+        android:layout_marginTop="8dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/material_grey_900"
+        android:textSize="@dimen/abc_text_size_subtitle_material_toolbar"
+        android:text="@string/pref_title_linkedData_uri"
+        android:layout_marginLeft="24dp"
+        android:layout_marginTop="10dp" />
+    <TextView
+        android:id="@+id/action_setLDUri"
+        android:textColor="#565252"
+        android:textSize="@dimen/abc_text_size_subtitle_material_toolbar"
+        android:textStyle="italic"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="24dp"
+        android:layout_marginTop="8dp"
+        android:visibility="visible" />
+
+
+    <Button
+        android:layout_width="wrap_content"
+        android:id="@+id/buttonConnectTest"
+        android:layout_height="wrap_content"
+        android:text="Verbindungstest"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/content"
+        android:elevation="5dp"
+        android:textSize="@dimen/abc_text_size_button_material"
+        android:textColor="@android:color/black"
+        android:layout_marginTop="16dp"
+        android:layout_gravity="center" />
+
+
+    <Button
+        android:id="@+id/action_settings_default"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Set to Default"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/content"
+        android:elevation="5dp"
+        android:textSize="@dimen/abc_text_size_button_material"
+        android:textColor="@android:color/black"
+        android:layout_marginTop="16dp"
+        android:layout_gravity="center" />
+
+</LinearLayout>

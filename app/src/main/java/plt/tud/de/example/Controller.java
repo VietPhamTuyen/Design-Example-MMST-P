@@ -1,6 +1,8 @@
 package plt.tud.de.example;
 
 import android.util.Log;
+import android.view.View;
+import android.widget.CheckBox;
 
 import java.util.ArrayList;
 
@@ -8,6 +10,7 @@ import plt.tud.de.example.model.Plan;
 import plt.tud.de.example.model.Status;
 import plt.tud.de.example.model.Tour;
 import plt.tud.de.example.model.WorkingStep;
+import plt.tud.de.example.showAppInformations.AppInformationActivity;
 
 /**
  * Created by Viet on 06.01.2016.
@@ -16,9 +19,9 @@ public class Controller {
 
     // static ArrayList<String> tourList = new ArrayList<String>();
     static ArrayList<Tour> tourList = new ArrayList<>();
-    static ArrayList<String> navigationDrawerList = new ArrayList<String>();       //Nav Drawer Tour, C1,C2,C3...
-    static ArrayList<String> maintenanceList = new ArrayList<String>();                 //plan list for currentTour
-    static ArrayList<String> workingStepStringList = new ArrayList<String>();      //Workingsteps for currentPlan
+    static ArrayList<String> navigationDrawerList = new ArrayList<>();            //Nav Drawer Tour, C1,C2,C3...
+    static ArrayList<String> maintenanceList = new ArrayList<>();                 //plan list for currentTour
+    static ArrayList<String> workingStepStringList = new ArrayList<>();           //Workingsteps for currentPlan
 
     static String currentTour = "";
     static String currentKennzeichen = "";
@@ -30,6 +33,7 @@ public class Controller {
     static MainActivity main;
     static StartActivity start;
 
+    static AppInformationActivity aia = new AppInformationActivity();
     static long timer = 0;
 
     static ArrayList<String> writeLDList = new ArrayList<>();
@@ -41,6 +45,10 @@ public class Controller {
         this.main = main;
     }
 
+    public void synchAppinfo(AppInformationActivity aia){
+        this.aia = aia;
+    }
+
     //TODO start this with createLD("getMaintenancePlan","","",""); anywhere
     public void createLD(String requestedData, String plan, String tourID, String workingStep) {
         //reset possibleStatusList in current workingsteps before getting new ones
@@ -48,14 +56,13 @@ public class Controller {
         if (requestedData.equals("getPossibleStatus")) {
             for (Plan plans : planList) {
                 if (plans.getMaintenancePlan().equals(currentPlan)) {
-                    if(!plans.check) {
+                    if (!plans.check) {
                         ArrayList<WorkingStep> steps = plans.getStepList();
                         for (WorkingStep step : steps) {
                             Log.i("reset", " " + step.getWorkingLabel());
                             step.resetPossibleStatusList();
                         }
-                    }
-                    else{
+                    } else {
                         reload = false;
                         break;
                     }
@@ -63,7 +70,7 @@ public class Controller {
                 }
             }
         }
-        if(reload) {
+        if (reload) {
             LDA.createLD(requestedData, plan, tourID, workingStep);
         }
     }
@@ -101,14 +108,14 @@ public class Controller {
      * look for right Plan, save workingStep in there
      *
      * @param maintenancePlan
-     * @param workingLink
+     * @param workingStep
      */
-    public void saveStep(String maintenancePlan, String tourID, String workingLink) {
+    public void saveStep(String maintenancePlan, String tourID, String workingStep) {
         for (Plan plans : planList) {
             if (plans.getMaintenancePlan().equals(maintenancePlan)) {
-                Log.i("saveStep", maintenancePlan + " , " + workingLink);
-                plans.saveStep(workingLink);
-                createLD("getWorkingTitle", maintenancePlan, tourID, workingLink);
+                Log.i("saveStep", maintenancePlan + " , " + workingStep);
+                plans.saveStep(workingStep);
+                createLD("getWorkingTitle", maintenancePlan, tourID, workingStep);
 
             }
         }
@@ -120,13 +127,13 @@ public class Controller {
      * 3rd LD request, look for right Plan, save workingLabel (how to do it) to the right workingLink(link for the WorkingStep)
      *
      * @param maintenancePlan
-     * @param workingLink
+     * @param workingStep
      * @param workinglabel
      */
-    public void saveWorkingLabel(String maintenancePlan, String workingLink, String workinglabel) {
+    public void saveWorkingLabel(String maintenancePlan, String workingStep, String workinglabel) {
         for (Plan plans : planList) {
             if (plans.getMaintenancePlan().equals(maintenancePlan)) {
-                plans.saveWorkingLabel(workingLink, workinglabel);
+                plans.saveWorkingLabel(workingStep, workinglabel);
 
             }
         }
@@ -154,9 +161,9 @@ public class Controller {
      * show a list with all tourIDs  in the navigation drawer
      */
     public void setNavList() {
-        navigationDrawerList = new ArrayList<String>();
-        navigationDrawerList.add("Tour");
-        tourList = new ArrayList<>();
+        navigationDrawerList = new ArrayList<>();
+        //TODO
+       // tourList = new ArrayList<>();
 
 
         for (Plan plan : planList) {
@@ -175,7 +182,7 @@ public class Controller {
             }
         }
         if (main.isActive) {
-            main.setMenuView(navigationDrawerList);
+            main.setMenuViewTour(tourList);
         }
 
         if (start.isActive) {
@@ -190,6 +197,7 @@ public class Controller {
      */
     public void changeNavDToMaintenanceList(String listPlan) {
         maintenanceList = new ArrayList<String>();
+        ArrayList<Plan> pList = new ArrayList<>();
 
         maintenanceList.add("Zurück");
 
@@ -197,10 +205,11 @@ public class Controller {
         for (Plan p : planList) {
             if (p.getTourID().equals(plan)) {         //add the maintenanceplan if its in the right tour
                 maintenanceList.add(p.getMaintenancePlan());
+                pList.add(p);
             }
         }
         if (main.isActive) {
-            main.setMenuView(maintenanceList);
+            main.setMenuViewPlan(pList);
         }
 
         if (start.isActive) {
@@ -212,7 +221,7 @@ public class Controller {
 
     public void changeNavDToMaintenanceList() {
         Log.i("changeNavDToM", " ");
-
+        ArrayList<Plan> pList = new ArrayList<>();
         maintenanceList = new ArrayList<String>();
         maintenanceList.add("Zurück");
         String plan = currentTour;
@@ -220,6 +229,7 @@ public class Controller {
         for (Plan p : planList) {
             if (p.getTourID().equals(plan)) {         //add the maintenanceplan if its in the right tour
                 maintenanceList.add(p.getMaintenancePlan());
+                pList.add(p);
             }
         }
 
@@ -227,7 +237,7 @@ public class Controller {
 
         if (main.isActive) {
             Log.i("main", "is active ");
-            main.setMenuView(maintenanceList);
+            main.setMenuViewPlan(pList);
         } else if (start.isActive) {
             start.updateListView(maintenanceList);
         }
@@ -338,9 +348,12 @@ public class Controller {
                     }
                 }
                 listItem.add(tourID);
+
             }
         }
 
+
+        ArrayList<Tour> t = new ArrayList<>();
 
         start.updateListView(listItem);
     }
@@ -388,32 +401,48 @@ public class Controller {
                     //currentPlan =
 
                     main.callpage(0);
+
+
+                    changeNavDToMaintenanceList();
                     return;
                 }
             } else {     // all plans done
-                for (int tourCounter = 0; tourCounter < tourList.size(); tourCounter++) {
-                    if (tourCounter + 1 < tourList.size()) {
+                for (int tourCounter = 1; tourCounter < tourList.size(); tourCounter++) {
+                    for (Plan p : planList) {
+                        if (p.getMaintenancePlan().equals(currentPlan)) {
+                            p.check();                      //check this plan
+                        }
+                    }
+                    if (tourCounter + 1 < tourList.size()) {                //not all tours done
+
                         if (currentTour.equals(tourList.get(tourCounter).getName())) {
                             //TODO check only if all plans are checked
-                            tourList.get(tourCounter).check();                            //check this tour
+
+                            Tour tour = tourList.get(tourCounter);
+                            tour.check();                            //check this tour
                             currentTour = tourList.get(tourCounter + 1).getName();        //current Tour = next tour
                             Log.i("----- ", " ---------------");
                             Log.i("current Tour", " " + tourList.get(tourCounter).getName());
                             Log.i("next Tour", " " + tourList.get(tourCounter + 1).getName());
                             changeNavDToMaintenanceList();
-                            setCurrentPlan(maintenanceList.get(1)); //current plan = first plan
+                            setCurrentPlan(maintenanceList.get(1));                       //current plan = first plan
                             //currentPlan = maintenanceList.get(1);
                             main.callpage(0);
+
+
                             return;
                         }
+
                     } else {  //all tours done, start with first again
                         //TODO jump to first?
                         main.beginAgain();
-                        tourList.get(tourCounter).check();                            //check this tour
+                        Tour tour = tourList.get(tourCounter);
+                        tour.check();                            //check this tour
 
 
-                        currentTour = tourList.get(0).getName();        //current Tour = first
+                        currentTour = tourList.get(1).getName();        //current Tour = first
                         changeNavDToMaintenanceList();
+                        Log.i("before setCurrentPlan", "");
                         setCurrentPlan(maintenanceList.get(1));         //current plan = first plan
                         //currentPlan = maintenanceList.get(1);
 
@@ -450,10 +479,10 @@ public class Controller {
     }
 
 
-    public void savePossibleStat(String maintenancePlan, String workingstep, String possStatLab) {
+    public void savePossibleStat(String maintenancePlan, String workingstep, String possStatLab, String planaddress) {
         for (Plan plans : planList) {
             if (plans.getMaintenancePlan().equals(maintenancePlan)) {
-                plans.savePossibleStat(workingstep, possStatLab);
+                plans.savePossibleStat(workingstep, possStatLab, planaddress);
 
             }
         }
@@ -476,21 +505,21 @@ public class Controller {
         }
     }
 
-    public void addLDwriteList(String text){
+    public void addLDwriteList(String text) {
         writeLDList.add(text);
     }
 
 
-    public void setStatuscheck(Status stat, boolean check){
-        for (Plan plan : planList){
+    public void setStatuscheck(Status stat, boolean check) {
+        for (Plan plan : planList) {
             if (plan.getMaintenancePlan().equals(currentPlan)) {
                 ArrayList<WorkingStep> currentWorkingStepList = plan.getStepList();
 
                 for (WorkingStep workingStep : currentWorkingStepList) {
                     ArrayList<Status> statusList = workingStep.getPossibleStatusList();
 
-                    for(Status status : statusList){
-                        if(status == stat){
+                    for (Status status : statusList) {
+                        if (status == stat) {
                             stat.setCheck(check);
                         }
                     }
@@ -501,5 +530,48 @@ public class Controller {
     }
 
 
+    public ArrayList<Tour> getTourList() {
+        return tourList;
+    }
 
+    public void setTourList(ArrayList<Tour> tourList) {
+        this.tourList = tourList;
+    }
+
+    public void changeView(CheckBox cb) {
+        try {
+            main.changeView(cb);
+        } catch (Exception e) {
+            Log.i("changeViewError-Con", " " + e.getMessage());
+        }
+
+    }
+
+
+
+
+    public boolean getTourCheck(String name){
+        for(Tour tour: tourList) {
+            String tourName = tour.getName();
+            if (name.equals(tourName)) {
+                return tour.check;
+            }
+        }
+
+        return false;
+    }
+
+    public void changeEndpoint(String endpoint) {
+        LDA.changeEndpoint(endpoint);
+
+    }
+    public void changeUri(String uri) {
+        LDA.changeUri(uri);
+
+    }
+
+
+    public void successLDTest(boolean status){
+        aia.successLDTest(status);
+    }
 }

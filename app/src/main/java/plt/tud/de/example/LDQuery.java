@@ -70,6 +70,11 @@ public class LDQuery {
 
     }
 
+
+    public void changeUri(String uri){
+        this.uri = uri;
+    }
+
     /**
      * composeQuery generates a query that gets all the predicates and
      * attributes of the
@@ -106,7 +111,7 @@ public class LDQuery {
                     + "FILTER regex(?id, \"" + tourID + "\")"       //TODO
 
                     + "?s rdfs:label ?kennzeichen."
-                    + "}  LIMIT 3"
+                    + "}  LIMIT 1"
             ;
 
 
@@ -210,6 +215,14 @@ public class LDQuery {
                     + "?possStat rdfs:label ?possStatLab"
 
                     + "}";
+
+        } else if(requestedData == "connectTest"){
+
+            query = "SELECT DISTINCT ?s ?p ?o FROM <" + uri + "> "
+                    + "WHERE {"
+                    + "?s ?p ?o"
+
+                    + "} LIMIT 1";
 
         }
 
@@ -357,6 +370,9 @@ public class LDQuery {
                     msg.what = 70;
                 } else if (requestedData == "getPossibleStatus") {
                     msg.what = 60;
+                }else if(requestedData == "connectTest"){
+                    msg.what = 50;
+
                 }
                 Bundle data = new Bundle();
                 data.putString("result", json);
@@ -400,7 +416,7 @@ public class LDQuery {
 
         public void handleMessage(Message message) {
             Log.i("Handler", "get it");
-            if (message.what == 90) { //getProp
+            if (message.what == 90) {
                 Log.i("what", "90");
 
                 Bundle resultBundle = message.getData();
@@ -481,14 +497,14 @@ public class LDQuery {
                         String kennzeichen = c.getJSONObject("kennzeichen")
                                 .getString("value")
                                 .replaceFirst("^.*#", "");
-                        String workingstep = c.getJSONObject("workingstep")
+                        String workingStep = c.getJSONObject("workingstep")
                                 .getString("value")
                                 .replaceFirst("^.*#", "");
 
 
-                        controller.saveStep(maintenancePlan, id, workingstep);
+                        controller.saveStep(maintenancePlan, id, workingStep);
 
-                        controller.makeToast("loading Working Steps\n"+ workingstep);
+                        controller.makeToast("loading Working Steps\n"+ workingStep);
 
                         //TODO call something
                         //fill list
@@ -555,7 +571,7 @@ public class LDQuery {
                 }
 
 
-            } else if (message.what == 60) { //getNodeID
+            } else if (message.what == 60) {
                 Log.i("what", "60");
 
                 Bundle resultBundle = message.getData();
@@ -571,7 +587,7 @@ public class LDQuery {
                             .getJSONArray("bindings");
                     for (int i = 0; i < titles.length(); i++) {
                         JSONObject c = titles.getJSONObject(i);
-                        String s = c.getJSONObject("s")
+                        String planaddress = c.getJSONObject("s")
                                 .getString("value")
                                 .replaceFirst("^.*#", "");
                         String maintenancePlan = c.getJSONObject("maintenancePlan")
@@ -592,9 +608,54 @@ public class LDQuery {
 
 
                         Log.i("60", possStatLab + " " + maintenancePlan + " " + workingstep);
-                        controller.savePossibleStat(maintenancePlan, workingstep, possStatLab);
+                        controller.savePossibleStat(maintenancePlan, workingstep, possStatLab,planaddress);
 
                         controller.makeToast("loading Possible Status");
+                        //TODO fill controller List
+                        //fill list
+                        //listItems.add(p);
+
+
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Log.i("error", e.getMessage());
+                }
+
+
+            }else if (message.what == 50) {
+                Log.i("what", "50");
+
+                Bundle resultBundle = message.getData();
+                String result = resultBundle.getString("result");
+                if (null == result)
+                    result = "No Result received!";
+                try {
+                    //parse result JSON string into JSON Object
+
+                    JSONObject results = new JSONObject(result);
+                    //Create JSON Array out of JSONObject
+                    JSONArray titles = results.getJSONObject("results")
+                            .getJSONArray("bindings");
+                    for (int i = 0; i < titles.length(); i++) {
+                        JSONObject c = titles.getJSONObject(i);
+                        String s = c.getJSONObject("s")
+                                .getString("value")
+                                .replaceFirst("^.*#", "");
+                        String p = c.getJSONObject("p")
+                                .getString("value")
+                                .replaceFirst("^.*#", "");
+                        String o = c.getJSONObject("o")
+                                .getString("value")
+                                .replaceFirst("^.*#", "");
+
+                        Log.i("50", s+" "+p+" "+o);
+                        if(!(s.equals(null)) && !(p.equals(null)) && !(o.equals(null))){
+                            controller.successLDTest(true);
+                        }else {
+                            controller.successLDTest(false);
+                        }
+
                         //TODO fill controller List
                         //fill list
                         //listItems.add(p);

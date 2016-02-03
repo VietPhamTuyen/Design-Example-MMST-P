@@ -11,7 +11,7 @@ import android.widget.ListView;
 import java.util.ArrayList;
 
 import plt.tud.de.example.Controller;
-import plt.tud.de.example.StatusAdapter;
+import plt.tud.de.example.Adapter.StatusAdapter;
 import plt.tud.de.example.R;
 import plt.tud.de.example.model.Status;
 

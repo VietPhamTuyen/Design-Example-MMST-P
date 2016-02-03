@@ -5,7 +5,7 @@ package plt.tud.de.example.model;
  */
 public class Tour {
     String name;
-    boolean check = false;
+    public boolean check = false;
 
     public Tour(String name){
         this.name = name;
@@ -20,4 +20,5 @@ public class Tour {
     public void check(){
         check = true;
     }
+
 }
