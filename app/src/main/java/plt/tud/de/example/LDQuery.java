@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,7 +72,7 @@ public class LDQuery {
     }
 
 
-    public void changeUri(String uri){
+    public void changeUri(String uri) {
         this.uri = uri;
     }
 
@@ -83,6 +84,7 @@ public class LDQuery {
      * @return the sparql query (String)
      */
     public String composeQuery(String requestedData, String plan, String tourID, String workingStep) {
+
 
         String query = "";
         if (requestedData == "getMaintenancePlan") {
@@ -111,7 +113,7 @@ public class LDQuery {
                     + "FILTER regex(?id, \"" + tourID + "\")"       //TODO
 
                     + "?s rdfs:label ?kennzeichen."
-                    + "}  LIMIT 1"
+                    + "} LIMIT 1"
             ;
 
 
@@ -183,7 +185,7 @@ public class LDQuery {
                     + "}  LIMIT 1";
 
         } else if (requestedData == "getPossibleStatus") {
-        Log.i("send", "getPossibleStatus");
+            Log.i("send", "getPossibleStatus");
             String rdfs = "http://www.w3.org/2000/01/rdf-schema#";
             String rdfsns = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
             String mto = "http://eatld.et.tu-dresden.de/mto/";
@@ -198,7 +200,7 @@ public class LDQuery {
                     + "PREFIX owl: <" + owl + ">"
                     + "PREFIX purl: <" + purl + ">"
 
-                    + "SELECT DISTINCT ?s ?maintenancePlan ?id ?kennzeichen ?workingstep ?possStatLab FROM <" + uri + "> "
+                    + "SELECT DISTINCT ?s ?maintenancePlan ?id ?kennzeichen ?workingstep ?possStatLab ?possStat FROM <" + uri + "> "
                     + "WHERE {"
                     + "?s mto:maintenancePlan ?maintenancePlan."
                     + "FILTER regex(?maintenancePlan, \"" + plan + "\")"      //TODO
@@ -216,13 +218,32 @@ public class LDQuery {
 
                     + "}";
 
-        } else if(requestedData == "connectTest"){
+        } else if (requestedData == "connectTest") {
 
             query = "SELECT DISTINCT ?s ?p ?o FROM <" + uri + "> "
                     + "WHERE {"
                     + "?s ?p ?o"
 
                     + "} LIMIT 1";
+
+        }else if (requestedData == "write") {
+            String mto = "http://eatld.et.tu-dresden.de/mto/";
+
+
+            query = "PREFIX mto: <" + mto + "> "
+                    + "INSERT{ GRAPH <" +uri + "> {"
+                    + "<"+ plan+ "> mto:hasActualStatus <"+tourID +">"      //plan is workingStep here, tourID is statusAddress here
+
+                    + "}}";
+
+        }else if (requestedData == "delete") {
+            String mto = "http://eatld.et.tu-dresden.de/mto/";
+
+            query = "PREFIX mto: <" + mto + "> "
+                    + "DELETE WHERE{ GRAPH <" +uri + "> {"
+                    + "<"+ plan+ "> mto:hasActualStatus ?s"      //plan is workingStep here, tourID is statusAddress here
+
+                    + "}}";
 
         }
 
@@ -316,7 +337,7 @@ public class LDQuery {
             //set up HTTP Post Request (look at http://virtuoso.openlinksw.com/dataspace/doc/dav/wiki/Main/VOSSparqlProtocol for Protocol)
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
             nameValuePairs.add(new BasicNameValuePair("format", "application/json"));
-            nameValuePairs.add(new BasicNameValuePair("query", composeQuery( requestedData, plan, tourID, workingStep)));
+            nameValuePairs.add(new BasicNameValuePair("query", composeQuery(requestedData, plan, tourID, workingStep)));
             nameValuePairs.add(new BasicNameValuePair("default-graph-uri", null));
             nameValuePairs.add(new BasicNameValuePair("named-graph-uri", null));
 
@@ -370,7 +391,7 @@ public class LDQuery {
                     msg.what = 70;
                 } else if (requestedData == "getPossibleStatus") {
                     msg.what = 60;
-                }else if(requestedData == "connectTest"){
+                } else if (requestedData == "connectTest") {
                     msg.what = 50;
 
                 }
@@ -387,13 +408,16 @@ public class LDQuery {
             } catch (IOException e) {
                 e.printStackTrace();
                 Log.e(LDQuery.class.getName(), e.getMessage());
-                controller.makeToast(LDQuery.class.getName()+ e.getMessage());
-				/*
+                controller.makeToast(LDQuery.class.getName() + e.getMessage());
+                /*
                  * There may be no network connection or a timeout.
 				 * Show toast to let the user check connections.
 				 */
                 networkFailure = 1;
+                controller.successLDTest(false);
                 // publishProgress(params);
+            } catch (Exception e) {
+                controller.successLDTest(false);
             }
 
             return null;
@@ -504,7 +528,7 @@ public class LDQuery {
 
                         controller.saveStep(maintenancePlan, id, workingStep);
 
-                        controller.makeToast("loading Working Steps\n"+ workingStep);
+                        controller.makeToast("loading Working Steps\n" + workingStep);
 
                         //TODO call something
                         //fill list
@@ -558,7 +582,7 @@ public class LDQuery {
                         controller.saveWorkingLabel(maintenancePlan, workingstep, workinglabel);
 
 
-                        controller.makeToast("loading Working Title \n"+ workinglabel);
+                        controller.makeToast("loading Working Title \n" + workinglabel);
                         //TODO fill controller List
                         //fill list
                         //listItems.add(p);
@@ -605,10 +629,13 @@ public class LDQuery {
                         String possStatLab = c.getJSONObject("possStatLab")
                                 .getString("value")
                                 .replaceFirst("^.*#", "");
+                        String statusAddress = c.getJSONObject("possStat")
+                                .getString("value")
+                                .replaceFirst("^.*#", "");
 
 
                         Log.i("60", possStatLab + " " + maintenancePlan + " " + workingstep);
-                        controller.savePossibleStat(maintenancePlan, workingstep, possStatLab,planaddress);
+                        controller.savePossibleStat(maintenancePlan, workingstep, possStatLab, planaddress, statusAddress);
 
                         controller.makeToast("loading Possible Status");
                         //TODO fill controller List
@@ -623,7 +650,7 @@ public class LDQuery {
                 }
 
 
-            }else if (message.what == 50) {
+            } else if (message.what == 50) {
                 Log.i("what", "50");
 
                 Bundle resultBundle = message.getData();
@@ -649,10 +676,10 @@ public class LDQuery {
                                 .getString("value")
                                 .replaceFirst("^.*#", "");
 
-                        Log.i("50", s+" "+p+" "+o);
-                        if(!(s.equals(null)) && !(p.equals(null)) && !(o.equals(null))){
+                        Log.i("50", s + " " + p + " " + o);
+                        if (!(s.equals(null)) && !(p.equals(null)) && !(o.equals(null))) {
                             controller.successLDTest(true);
-                        }else {
+                        } else {
                             controller.successLDTest(false);
                         }
 
@@ -665,6 +692,7 @@ public class LDQuery {
                 } catch (JSONException e) {
                     e.printStackTrace();
                     Log.i("error", e.getMessage());
+                    controller.successLDTest(false);
                 }
 
 

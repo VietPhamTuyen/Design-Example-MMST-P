@@ -1,8 +1,12 @@
 package plt.tud.de.example;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -31,6 +35,12 @@ import plt.tud.de.example.showAppInformations.AppInformationActivity;
  * Created by Viet on 05.01.2016.
  */
 public class StartActivity extends AppCompatActivity {
+
+    private static final String DEFAULT_LD_ENDPOINT = "http://eatld.et.tu-dresden.de/sparql-auth";
+    private static final String DEFAULT_LD_URI = "http://eatld.et.tu-dresden.de/mti-mmst2015_g2_1";
+
+    private static final String PREF_KEY_LD_ENDPOINT = "LDEndpoint";
+    private static final String PREF_KEY_LD_URI = "LDUri";
 
     static boolean isActive = false;
     static Controller controller = new Controller();
@@ -78,6 +88,7 @@ public class StartActivity extends AppCompatActivity {
                     if (t - timer > 5000) {    // time from last toast to now
                         controller.setCurrentPlan(text.getText().toString());
                         Intent intent = new Intent(getBaseContext(), MainActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         startActivity(intent);
                     }else {
                         makeToastNoTime("still loading");
@@ -90,12 +101,41 @@ public class StartActivity extends AppCompatActivity {
         });
 
 
-
+       // getLDData();
         controller.createLD("getMaintenancePlan", "", "", ""); //TODO
 
-        controller.updateStartActivity(this);
+       controller.updateStartActivity(this);
         setTitle(getResources().getText(R.string.app_name));
     }
+
+
+
+    private void getLDData() {
+        if (isNetworkAvailable()) {
+            controller.deleteList();
+            SharedPreferences settings = this.getSharedPreferences("settings", 0);
+            String ldEndpoint = settings.getString(PREF_KEY_LD_ENDPOINT, DEFAULT_LD_ENDPOINT);
+            String ldUri = settings.getString(PREF_KEY_LD_URI, DEFAULT_LD_URI);
+            controller.changeEndpoint(ldEndpoint);
+            controller.changeUri(ldUri);
+            controller.createLD("getMaintenancePlan", "", "", ""); //TODO
+
+            controller.updateStartActivity(this);
+        } else {
+        }
+    }
+
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) start.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+
+
+
 
     /**
      * refresh List

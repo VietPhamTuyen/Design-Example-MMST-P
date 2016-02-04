@@ -63,7 +63,7 @@ public class PlanAdapter extends ArrayAdapter {
                 public void onClick(View v) {
                     TextView view = (TextView) v;
 
-                    if (view.getText().equals("zurueck")) {
+                    if (view.getText().equals("back")) {
                         controller.setNavList();
                     }
 
@@ -102,9 +102,9 @@ public class PlanAdapter extends ArrayAdapter {
         holder.name.setTag(plan);
 
 
-        if (plan.getTourID().equals("zurueck") && plan.getMaintenancePlan().equals("zurueck")) {
+        if (plan.getTourID().equals("back") && plan.getMaintenancePlan().equals("back")) {
             holder.name.setVisibility(View.INVISIBLE);
-            holder.code.setText("zurück");
+            holder.code.setText("back");
         } else {
 
         }

@@ -236,10 +236,7 @@ public class MainActivity extends AppCompatActivity implements
                 } else if (!(currentPage == 3)) {
                     set_currentPage(currentPage + 1);
                 } else { // current page == 3
-                    //TODO add dialog
-                    controller.nextPlan();
-
-                    setTitleName();
+                    switchPlan();
                 }
 
                 return false;
@@ -343,9 +340,9 @@ public class MainActivity extends AppCompatActivity implements
         ListView parameterList = (ListView) findViewById(R.id.left_drawer);
         //parameterList.setAdapter(new ArrayAdapter<>(this, R.layout.list_item, incomingList));
 
-        Plan zurueck = new Plan("zurueck", "zurueck", "zurueck");
+        Plan back = new Plan("back", "back", "back");
 
-        incomingList.add(0, zurueck);
+        incomingList.add(0, back);
         PlanAdapter adapter = new PlanAdapter(this, incomingList);
         parameterList.setAdapter(adapter);
 
@@ -383,12 +380,14 @@ public class MainActivity extends AppCompatActivity implements
         if (id == R.id.settings) {
             Intent intent2 = new Intent(main, AppInformationActivity.class);
             intent2.putExtra("site", "settings");
+            intent2.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent2);
             return true;
         }
         if (id == R.id.about) {
             Intent intent2 = new Intent(main, AppInformationActivity.class);
             intent2.putExtra("site", "about");
+            intent2.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent2);
             return true;
         }
@@ -405,7 +404,7 @@ public class MainActivity extends AppCompatActivity implements
         if (mViewPager.getCurrentItem() == 0) {
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage("Are you sure you want to close the app?").setCancelable(true).
+            builder.setMessage("Are you sure you want to close the App").setCancelable(true).
                     setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
                             MainActivity.super.onBackPressed();
@@ -449,11 +448,8 @@ public class MainActivity extends AppCompatActivity implements
         switch (v.getId()) {
 
             case R.id.button_result_ok:
-                switchToast();
                 Log.i("button", "button_result_ok");
-                //TODO add dialog
-                controller.nextPlan();
-                setTitleName();
+                switchPlan();
                 break;
 
         }
@@ -510,13 +506,13 @@ public class MainActivity extends AppCompatActivity implements
             Log.i(myTAG, "getPageTitle" + String.valueOf(position));
             switch (position) {
                 case 0:
-                    return "Aufgabe";
+                    return getString(R.string.tab_task);
                 case 1:
-                    return "Durchfuehrung";
+                    return getString(R.string.tab_implementation);
                 case 2:
-                    return "Rueckgabewert";
+                    return getString(R.string.tab_return);
                 case 3:
-                    return "Ergebnis";
+                    return getString(R.string.tab_result);
             }
             return null;
         }
@@ -671,7 +667,7 @@ public class MainActivity extends AppCompatActivity implements
                 controller.changeNavDToMaintenanceList(checkBox.getText().toString());
                 controller.setCurrentTour(checkBox.getText().toString());
             }
-        } else if (checkBox.getText().equals("zurueck")) {                       //if back is clicked
+        } else if (checkBox.getText().equals("back")) {                       //if back is clicked
             controller.setNavList();                                            //change to Tour List
         } else {
             controller.setCurrentPlan(checkBox.getText().toString());
@@ -742,5 +738,25 @@ public class MainActivity extends AppCompatActivity implements
         return true;
     }
 
+
+    public void switchPlan() {
+
+        new AlertDialog.Builder(this)
+                .setTitle("Check this plan")
+                .setMessage("Are you sure you want to check this Plan?")
+                .setCancelable(true)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        switchToast();
+
+                        controller.writeLD();
+                        controller.nextPlan();
+                        setTitleName();
+                    }
+                })
+                .show();
+
+
+    }
 
 }

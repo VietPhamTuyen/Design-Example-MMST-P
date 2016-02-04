@@ -1,5 +1,8 @@
 package plt.tud.de.example;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
@@ -45,7 +48,7 @@ public class Controller {
         this.main = main;
     }
 
-    public void synchAppinfo(AppInformationActivity aia){
+    public void synchAppinfo(AppInformationActivity aia) {
         this.aia = aia;
     }
 
@@ -90,8 +93,25 @@ public class Controller {
         }
         Plan plans = new Plan(maintenancePlan, tourID, kennzeichen);
         planList.add(plans);
-        Tour t = new Tour(plans.getTourID());
-        tourList.add(t);
+
+
+        for (Plan plan : planList) {
+            String tourIDname = plan.getTourID();
+            tourexist:
+            {
+                //filter add if tour not exist
+                for (Tour tour : tourList) {
+                    if (tour.getName().equals(tourIDname)) {
+                        break tourexist;
+                    }
+                }
+                Tour t = new Tour(plans.getTourID());
+                tourList.add(t);
+                navigationDrawerList.add(plans.getTourID());
+            }
+        }
+
+
         Log.i("createPlan", " " + maintenancePlan + " " + tourID);
         try {
             getStartList();
@@ -163,7 +183,7 @@ public class Controller {
     public void setNavList() {
         navigationDrawerList = new ArrayList<>();
         //TODO
-       // tourList = new ArrayList<>();
+        // tourList = new ArrayList<>();
 
 
         for (Plan plan : planList) {
@@ -199,7 +219,7 @@ public class Controller {
         maintenanceList = new ArrayList<String>();
         ArrayList<Plan> pList = new ArrayList<>();
 
-        maintenanceList.add("Zurück");
+        maintenanceList.add("back");
 
         String plan = listPlan;
         for (Plan p : planList) {
@@ -352,12 +372,11 @@ public class Controller {
             }
         }
 
+        if (start.isActive) {
 
-        ArrayList<Tour> t = new ArrayList<>();
-
-        start.updateListView(listItem);
+            start.updateListView(listItem);
+        }
     }
-
 
     /**
      * show Kennzeichen in first Tab ( Fragment Implementation)
@@ -479,10 +498,10 @@ public class Controller {
     }
 
 
-    public void savePossibleStat(String maintenancePlan, String workingstep, String possStatLab, String planaddress) {
+    public void savePossibleStat(String maintenancePlan, String workingstep, String possStatLab, String planaddress, String statusAddress) {
         for (Plan plans : planList) {
             if (plans.getMaintenancePlan().equals(maintenancePlan)) {
-                plans.savePossibleStat(workingstep, possStatLab, planaddress);
+                plans.savePossibleStat(workingstep, possStatLab, planaddress, statusAddress);
 
             }
         }
@@ -548,10 +567,8 @@ public class Controller {
     }
 
 
-
-
-    public boolean getTourCheck(String name){
-        for(Tour tour: tourList) {
+    public boolean getTourCheck(String name) {
+        for (Tour tour : tourList) {
             String tourName = tour.getName();
             if (name.equals(tourName)) {
                 return tour.check;
@@ -565,13 +582,51 @@ public class Controller {
         LDA.changeEndpoint(endpoint);
 
     }
+
     public void changeUri(String uri) {
         LDA.changeUri(uri);
 
     }
 
 
-    public void successLDTest(boolean status){
+    public void successLDTest(boolean status) {
         aia.successLDTest(status);
+    }
+
+
+    public void deleteList() {
+        tourList = new ArrayList<>();
+        navigationDrawerList = new ArrayList<>();
+        maintenanceList = new ArrayList<>();
+        workingStepStringList = new ArrayList<>();
+
+        currentTour = "";
+        currentKennzeichen = "";
+        currentPlan = "";
+        currentMaintenanceStep = "";
+
+        planList = new ArrayList<Plan>();
+    }
+
+
+    public void writeLD(){
+
+        for (Plan plans : planList) {
+            if (plans.getMaintenancePlan().equals(currentPlan)) {
+                    ArrayList<WorkingStep> steps = plans.getStepList();
+                    for (WorkingStep step : steps) {
+                        ArrayList<Status> statusList = step.getPossibleStatusList();
+                        LDA.createLD("delete",step.getStepLink(),"","");
+
+                        for(Status stat: statusList) {
+                            if (stat.getCheck()) {
+
+                                LDA.createLD("write",stat.getWorkingStep(),stat.getstatusAddress(),"");
+                            }
+                        }
+                    }
+
+            }
+        }
     }
 }

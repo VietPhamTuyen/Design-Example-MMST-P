@@ -10,11 +10,16 @@ public class Status {
     String workingStep;
     String planaddress;
     boolean check = false;
+    String workingstep;
+    String workingLabel;
+    String statusAddress;
 
-    public Status(String statusName, String workingStep, String planaddress) {
+    public Status(String statusName,  String planaddress,String workingstep, String workingLabel, String statusAddress) {
         this.statusName = statusName;
-        this.workingStep = workingStep;
+        this.workingstep = workingstep;
         this.planaddress = planaddress;
+        this.workingLabel = workingLabel;
+        this.statusAddress = statusAddress;
     }
 
     public void setCheck(boolean check){
@@ -31,6 +36,10 @@ public class Status {
     }
 
     public String getStepName(){
-        return workingStep;
+        return workingLabel;
     }
+
+    public String getWorkingStep(){return workingstep;}
+
+    public String getstatusAddress(){return statusAddress;}
 }

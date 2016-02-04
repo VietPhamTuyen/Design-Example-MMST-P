@@ -40,16 +40,14 @@
     <string name="ok">Ok</string>
     <string name="cancel">cancel</string>
 
-    <string name="settings">Einstellung</string>
-    <string name="about">Über diese App</string>
 
-    <string-array name="items">
-        <item>Item 1</item>
-        <item>Item 2</item>
-        <item>Item 3</item>
-        <item>Item 4</item>
-        <item>Item 5</item>
-        <item>Item 6</item>
-    </string-array>
+
+    <string name="tab_task">Task</string>
+    <string name="tab_implementation">Procedure</string>
+    <string name="tab_return">Return</string>
+    <string name="tab_result">Result</string>
+
+
+
 
 </resources>

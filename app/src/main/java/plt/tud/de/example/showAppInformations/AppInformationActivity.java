@@ -58,7 +58,7 @@ static Controller controller = new Controller();
 
         //Set the Connection fragment as start fragment
         if ((findViewById(R.id.content_frame) != null) && (destination.equals("about"))) {
-            actionBar.setTitle("Über diese App");
+            actionBar.setTitle("About this App");
             // if restored from a previous state,no need to do anything
             if (savedInstanceState != null) {
                 return;
@@ -75,7 +75,7 @@ static Controller controller = new Controller();
                     .add(R.id.content_frame, connFragment).commit();
         }else if ((findViewById(R.id.content_frame) != null) && (destination.equals("settings"))) {
 
-            actionBar.setTitle("Einstellungen");
+            actionBar.setTitle("Settings");
             // if restored from a previous state,no need to do anything
             if (savedInstanceState != null) {
                 return;
@@ -118,8 +118,8 @@ static Controller controller = new Controller();
         try{
             Log.i("successLDTest", String.valueOf(status) );
             if(status)
-            Toast.makeText(this,"Verbindung erfolgreich", Toast.LENGTH_SHORT).show();
-            else Toast.makeText(this,"keine Verbindung", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,"successfully connected", Toast.LENGTH_SHORT).show();
+            else Toast.makeText(this,"no connection", Toast.LENGTH_SHORT).show();
         }catch(Exception e){
             Log.i("successLDTest", "error "+e.getMessage() );
         }

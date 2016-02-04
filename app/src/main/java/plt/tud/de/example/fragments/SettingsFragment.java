@@ -1,7 +1,10 @@
 package plt.tud.de.example.fragments;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.preference.PreferenceFragment;
@@ -11,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import plt.tud.de.example.Controller;
 import plt.tud.de.example.R;
@@ -21,11 +25,9 @@ import plt.tud.de.example.R;
 public class SettingsFragment extends Fragment {
     private View view;
 
-    private static final String DEFAULT_OPC_ADRESS = "opc.tcp://10.4.53.25:4845/PCSOSClient1";
-    private static final String DEFAULT_LD_ENDPOINT = "http://eatld.et.tu-dresden.de/sparql";
-    private static final String DEFAULT_LD_URI = "http://eatld.et.tu-dresden.de/gzat";
+    private static final String DEFAULT_LD_ENDPOINT = "http://eatld.et.tu-dresden.de/sparql-auth";
+    private static final String DEFAULT_LD_URI = "http://eatld.et.tu-dresden.de/mti-mmst2015_g2_1";
 
-    private static final String PREF_KEY_OPC_ADRESS = "OPCAdress";
     private static final String PREF_KEY_LD_ENDPOINT = "LDEndpoint";
     private static final String PREF_KEY_LD_URI = "LDUri";
 
@@ -41,7 +43,6 @@ public class SettingsFragment extends Fragment {
         final TextView editLDUri = (TextView) view.findViewById(R.id.action_setLDUri);
 
         SharedPreferences settings = getActivity().getSharedPreferences("settings", 0);
-        final String opcAdress = settings.getString(PREF_KEY_OPC_ADRESS, DEFAULT_OPC_ADRESS);
         final String ldEndpoint = settings.getString(PREF_KEY_LD_ENDPOINT, DEFAULT_LD_ENDPOINT);
         final String ldUri = settings.getString(PREF_KEY_LD_URI, DEFAULT_LD_URI);
 
@@ -78,26 +79,49 @@ public class SettingsFragment extends Fragment {
         });
 
 
-        Button conntectTest = (Button)view.findViewById(R.id.buttonConnectTest);
+        Button conntectTest = (Button) view.findViewById(R.id.buttonConnectTest);
         conntectTest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                controller.createLD("connectTest", "", "", "");
+                if (isNetworkAvailable()) {
+                    controller.createLD("connectTest", "", "", "");
+
+                    controller.deleteList();
+                    controller.createLD("getMaintenancePlan", "", "", "");
+                    controller.getStartList();
+
+
+                } else {
+                    Toast.makeText(getActivity(), "keine Internetverbindung", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
         return view;
     }
 
-    private void updateSetting(TextView tv, String preference, String newValue){
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+    private void updateSetting(TextView tv, String preference, String newValue) {
         SharedPreferences settings = getActivity().getSharedPreferences("settings", 0);
         SharedPreferences.Editor editor = settings.edit();
         editor.putString(preference, newValue);
         editor.commit();
         tv.setText(newValue);
+
+
+
+
+
+
     }
 
-    private void editSetting(TextView textView, String settingString, String titleText){
+    private void editSetting(TextView textView, String settingString, String titleText) {
         final TextView tv = textView;
         final String setting = settingString;
 
@@ -106,7 +130,7 @@ public class SettingsFragment extends Fragment {
 
         final Dialog d = new Dialog(this.getActivity());
         d.setContentView(R.layout.settings_dialog);
-        TextView title = (TextView)d.findViewById(R.id.label);
+        TextView title = (TextView) d.findViewById(R.id.label);
         title.setText(titleText);
 
         final EditText edit = (EditText) d.findViewById(R.id.edit1);
@@ -119,8 +143,10 @@ public class SettingsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 updateSetting(tv, setting, edit.getText().toString());
-                if (setting.equals(PREF_KEY_LD_ENDPOINT)) controller.changeEndpoint(edit.getText().toString());
-                if (setting.equals(PREF_KEY_LD_URI)) controller.changeUri(edit.getText().toString());
+                if (setting.equals(PREF_KEY_LD_ENDPOINT))
+                    controller.changeEndpoint(edit.getText().toString());
+                if (setting.equals(PREF_KEY_LD_URI))
+                    controller.changeUri(edit.getText().toString());
                 d.dismiss();
             }
         });
@@ -134,4 +160,8 @@ public class SettingsFragment extends Fragment {
         d.show();
 
     }
+
+
+
+
 }
